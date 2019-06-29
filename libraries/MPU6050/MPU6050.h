@@ -360,6 +360,7 @@ THE SOFTWARE.
 
 #define MPU6050_DELAYCTRL_DELAY_ES_SHADOW_BIT   7
 #define MPU6050_DELAYCTRL_I2C_SLV4_DLY_EN_BIT   4
+
 #define MPU6050_DELAYCTRL_I2C_SLV3_DLY_EN_BIT   3
 #define MPU6050_DELAYCTRL_I2C_SLV2_DLY_EN_BIT   2
 #define MPU6050_DELAYCTRL_I2C_SLV1_DLY_EN_BIT   1
@@ -438,6 +439,7 @@ class MPU6050 {
         MPU6050(uint8_t address=MPU6050_DEFAULT_ADDRESS);
 
         void initialize();
+		void initialize(uint8_t, uint8_t){
         bool testConnection();
 
         // AUX_VDDIO register
