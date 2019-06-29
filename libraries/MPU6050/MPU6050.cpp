@@ -22,16 +22,14 @@ MPU6050::MPU6050(uint8_t address):devAddr(address) {
  * the default internal clock source.
  */
 void MPU6050::initialize() {
-    setClockSource(MPU6050_CLOCK_PLL_XGYRO);
-    setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-    setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-    setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+	// Recall initialize with default settings.
+	initialize(MPU6050_GYRO_FS_250, MPU6050_ACCEL_FS_2);
 }
-void MPU6050::initialize(uint8_t gyroIn=MPU6050_GYRO_FS_250, uint8_t accelIn=MPU6050_ACCEL_FS_2) {
+void MPU6050::initialize(uint8_t gyroIn, uint8_t accelIn) {
     setClockSource(MPU6050_CLOCK_PLL_XGYRO);
     setFullScaleGyroRange(gyroIn);
     setFullScaleAccelRange(accelIn);
-    setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+    setSleepEnabled(false);
 }
 
 /** Verify the I2C connection.
