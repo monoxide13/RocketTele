@@ -31,7 +31,7 @@ private:
 
 public:
 	ms5611(int);
-	void init();
+	unsigned char init();
 	unsigned long cmd_adc(char cmd) ;
 	unsigned long getPressure();
 	unsigned long getTemperature();

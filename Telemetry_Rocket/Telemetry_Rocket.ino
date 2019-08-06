@@ -9,6 +9,7 @@
 #define STAGESEPERATION_PIN 5  // Limit switch detects stage seperation
 #define HC12_SET_PIN 6        // HC12 serial TX/RX command mode pin
 #define MPU6050_INT_PIN 12    // Accel interrupt
+#define MPU6050_ADDRESS 0x68  // Accel I2C address
 #define BARO_CS 6             // Barometer chip select
 #define BUZZER_PIN            // Buzzer
 
@@ -28,6 +29,7 @@
 #include <MPU6050_6Axis_MotionApps20.h>
 #include <helper_3dmath.h>
 #include <MPU6050.h>
+#include <ms5611.h>
 
 
 #define TELE_TX //
@@ -71,7 +73,8 @@ unsigned long updateTime = 0;
 #ifdef USE_TELE
 HC12 telemetry(&Serial1, HC12_SET_PIN);
 #endif
-MPU6050 accel(0x68);
+MPU6050 accel(MPU6050_ADDRESS);
+ms5611 baro(BARO_CS);
 #ifdef USE_SD
 File logFile;
 #endif
@@ -297,10 +300,18 @@ void loop() {
       switch (sensorCount) {
         case 0:
           switch (sensors.barometer) {
-            // TODO: NEEDS IMPLEMENTATION
-            case 0:
-              sensors.barometer = 1;
+            case 0: // Set sensor to startup.
+              sensors.barometer=3;
+            break;
+            case 3: // Sensor in startup.
+              if(baro.init()==0){
+                sensors.barometer = 1;
+              }else{
+                sensors.barometer = 4;
+              }
               break;
+             case 4: // Sensor in calibration. Set ground level.
+                sensors
           }
           break;
         case 1:

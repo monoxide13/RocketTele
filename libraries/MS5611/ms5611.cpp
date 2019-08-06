@@ -24,7 +24,7 @@ void ms5611::init() {
   for (int i = 0; i < 8; i++) {
     C[i] = cmd_prom(i); // read calibration coefficients
   }
-  n_crc = crc4(C);
+  return (n_crc = crc4(C));
 }
 
 unsigned long ms5611::cmd_adc(char cmd) {
