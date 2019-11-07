@@ -10,7 +10,7 @@
 #define HC12_SET_PIN 6        // HC12 serial TX/RX command mode pin
 #define MPU6050_INT_PIN 12    // Accel interrupt
 #define MPU6050_ADDRESS 0x68  // Accel I2C address
-#define BARO_CS 6             // Barometer chip select
+#define MPU6511_CS 6          // Barometer chip select
 #define BUZZER_PIN            // Buzzer
 
 
@@ -29,8 +29,7 @@
 #include <MPU6050_6Axis_MotionApps20.h>
 #include <helper_3dmath.h>
 #include <MPU6050.h>
-#include <ms5611.h>
-
+#include <MS5611.h>
 
 #define TELE_TX //
 #define TELE_SU
@@ -66,6 +65,7 @@ VectorInt16 accel_a;         // [x, y, z]            accel sensor measurements
 int16_t accel_history[] = {0, 0, 0};
 uint8_t accel_hist_c = 0;
 uint8_t accel_buffer[64]; // FIFO storage buffer
+uint8_t buzzerCounter = 0;
 volatile bool accelDataReady = false;     // indicates whether MPU interrupt pin has gone high
 unsigned int stageCounter = 1; // Start at 1 to keep all stages consistant
 uint32_t loopCount = 0;
@@ -74,7 +74,7 @@ unsigned long updateTime = 0;
 HC12 telemetry(&Serial1, HC12_SET_PIN);
 #endif
 MPU6050 accel(MPU6050_ADDRESS);
-ms5611 baro(BARO_CS);
+MS5611 barometer(BARO_CS);
 #ifdef USE_SD
 File logFile;
 #endif
@@ -87,11 +87,6 @@ void SERCOM1_Handler()
 
 void accelInterrupt() {
   accelDataReady = true;
-}
-
-void mpu6050_zero() {
-  // Use gravity to determine where down is and set initial gyro values accordingly.
-
 }
 
 void setup() {
@@ -114,6 +109,7 @@ void setup() {
   pinMode(SD_CS_PIN, OUTPUT);
   digitalWrite(SD_CS_PIN, HIGH);
   pinMode(MPU6050_INT_PIN, INPUT);
+  pinMode(BARO_CS, OUTPUT);
 
   // Start serial ports.
   GPSSerial.begin(115200);
@@ -123,8 +119,17 @@ void setup() {
   // Begin transmitting to base camp.
 #ifdef USE_TELE
   telemetry.init();
-  TELE_TX("STLSTL");
 #endif
+  int x;
+  // TODO: Turn buzzer on.
+  for (x = 0; x < 3; ++x) {
+    // Signal rocket in startup. 3 seconds of solid sound.
+#ifdef USE_TELE
+    TELE_TX("STRSTR");
+#endif
+    delay(1000);
+  }
+  // TODO: Turn buzzer off.
 
   // Check if SD Card is present.
 #ifdef USE_SD
@@ -133,7 +138,9 @@ void setup() {
 #ifdef USE_TELE
     TELE_TX("S33S33");
 #endif
+#ifdef USE_USB
     Serial.println("SD card present");
+#endif
     sensors.sd = 3;
     if (SD.begin(SD_CS_PIN)) {
 #ifdef USE_TELE
@@ -158,7 +165,9 @@ void setup() {
       sensors.sd = 5;
       logFile.write("File Opened");
     } else {
+#ifdef USE_USB
       Serial.println("Unable to open SD card!");
+#endif
       sensors.sd = 1;
 #ifdef USE_TELE
       TELE_TX("S36S36");
@@ -177,79 +186,85 @@ void setup() {
 #else
   sensors.sd = 1;
 #endif
-
+  if (sensors.sd == 5) {
+    // TODO: Sound buzzer two long tones.
+  } else {
+    // TODO: Sound buzzer two short tones.
+  }
+  delay(1000);
+  stageCounter = 1;
+  stage = 0;
+  buzzerCounter = 0;
 }
 
-void loop() {
-  /* Read commands from HC12 and store them to be used.
-  */
-  //  Serial.print(stage);
-  //  Serial.print("-");
-  //  Serial.println(stageCounter);
-#ifdef USE_TELE
-  telemetry.receive();
-#endif
-#ifdef USE_TELE
-  if (telemetry.stageChange(false) != 0) {
-    stage = telemetry.stageChange(true);
-  }
-#endif
 
+
+void loop() {
   switch (stage) {
-    /* Case 0
-       Wait for connection from HC12 to initiate start. No user input required.
-       Base station will send HBTHBT to rocket. Rocket will send "C00C00: Heartbeat" to base station.
-    */
     case 0:
 #ifdef USE_TELE
-      TELE_TX("C00C00");
-      if (telemetry.lastHeartbeat != 0) {
-        stage = 1;
-        stageCounter = 0;
-      }
       if (stageCounter == 1) {
-        updateTime = millis();
+        TELE_TX("C00C00");
       }
-      ++stageCounter;
-#else
+#endif
 #ifdef USE_USB
       if (stageCounter == 1) {
         Serial.println("-Stage 0 start");
       }
 #endif
-      if (stageCounter >= 1000) {
-        delay(5);
-        stage = 1;
-        stageCounter = 0;
+      if (stageCounter == 1) {
+        updateTime = 500 + millis();
+        // TODO: Signal system startup. 3 short beeps.
       }
-#endif
+      if (updateTime < millis()) {
+        switch (buzzerCounter) {
+          case 0:
+            // TODO: Turn buzzer off.
+            updateTime = millis() + 500;
+            buzzerCounter = 1;
+            break;
+          case 1:
+            // TODO: Turn buzzer on.
+            updateTime = millis() + 500;
+            buzzerCounter = 2;
+            break;
+          case 2:
+            // TODO: Turn buzzer off.
+            updateTime = millis() + 500;
+            buzzerCounter = 3;
+            break;
+          case 3:
+            // TODO: Turn buzzer on.
+            updateTime = millis() + 500;
+            buzzerCounter = 4;
+            break;
+          case 4:
+            // TODO: Turn buzzer off.
+            stage = 1;
+            stageCounter = 0;
+            buzzerCounter = 0;
+            break;
+        }
+      }
       break;
     /* Case 1
-       Preflight. Wait for initialize signal from base station (INTINT)
+       Preflight.
     */
     case 1:
       if (stageCounter == 1) {
 #ifdef USE_USB
         Serial.println("-Stage 1 start");
 #endif
-        updateTime = 0;
-      }
+
 #ifdef USE_TELE
-      if (updateTime + 3000 < millis()) {
-        updateTime = millis();
-        TELE_TX("C10C10"); // Waiting to start initialization.
-      }
-      if (telemetry.lastRead == "INTINT") {
-        stage = 2;
-        stageCounter = 0;
-      }
-#else
-      if (stageCounter == 1000) {
-        delay(5);
-        stage = 2;
-        stageCounter = 0;
-      }
+        TELE_TX("C10C10"); // Start initialization.
 #endif
+        updateTime = millis() + 5000;
+      }
+      if (millis() > updateTime) {
+        stage = 2;
+        stageCounter = 0;
+      }
       break;
     /* Case 2
         Start and calibrate sensors. Barometer, Accel, GPS.
@@ -273,10 +288,10 @@ void loop() {
         Serial.println("-Stage 2 start");
 #endif
 #ifdef USE_TELE
-        telemetry.changeBaud(54000); // TODO: Check if works.
+        TELE_TX("C20C20"); // Start initialization.
 #endif
       }
-      if (sensorCount == 0) {
+      if (sensorCount == 0) { // Every time sensorCount is 0, send progress report to base.
         int x, y = 0;
         char sensorChar[8] = "S00S00";
         sensorChar[7] = '\0';
@@ -287,7 +302,9 @@ void loop() {
 #ifdef USE_TELE
           TELE_TX(sensorChar);
 #endif
+#ifdef USE_USB
           Serial.println(sensorChar);
+#endif
         }
         Serial.println("Checking if sensors ready");
         if ( ((sensors.barometer - 1) % 4 == 0) && ((sensors.accel - 1) % 4 == 0) && \
@@ -295,23 +312,37 @@ void loop() {
           Serial.println("Sensors ready");
           stage = 3;
           stageCounter = 0;
+          sensorCount=5; // Sensors are ready, skip the case loop;
+        }
+        if (stageCounter > 100) {
+#ifdef USE_USB
+          Serial.println("ERROR! Sensors not sure if ready, moving forwards anyways.");
+#endif
+#ifdef USE_TELE
+          TELE_TX("C39C39");
+#endif
+          stage = 3;
+          stageCounter = 0;
+          sensorCount=5; // Sensors are ready, skip the case loop;
         }
       }
       switch (sensorCount) {
         case 0:
           switch (sensors.barometer) {
-            case 0: // Set sensor to startup.
-              sensors.barometer=3;
-            break;
+            case 0: // Reset sensor and set to startup.
+              barometer.cmd_reboot(); // Trigger reboot.
+              sensors.barometer = 3;
+              break;
             case 3: // Sensor in startup.
-              if(baro.init()==0){
-                sensors.barometer = 1;
-              }else{
+              if (barometer.init()==0) {
+                sensors.barometer = 1; // Error.
+              } else {
                 sensors.barometer = 4;
               }
               break;
-             case 4: // Sensor in calibration. Set ground level.
-                sensors
+            case 4: // Sensor in calibration. Set ground level.
+              barometer.setStationPressure();
+            break;
           }
           break;
         case 1:
@@ -351,22 +382,21 @@ void loop() {
               break;
           }
           break;
+          default:
+          break;
       }
       if (++sensorCount > 3) {
         sensorCount = 0;
       }
       break;
     /* Case 3
-       Rocket ready. Wait for go/no-go signal from base station (RGORGO).
-        If rocket not ready, it can be sent back to calibration or reset.
+    *  Rocket should be ready. Varify all checks are complete.
+    *  If not send error and send back to sensor phase or reset.
     */
     case 3:
       if (stageCounter == 1) {
 #ifdef USE_USB
         Serial.println("-Stage 3 starting");
-#endif
-#ifdef USE_TELE
-        telemetry.changeBaud(2400);
 #endif
       }
 #ifdef USE_TELE
