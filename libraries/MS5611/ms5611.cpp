@@ -9,33 +9,34 @@
  *  1911
  */
 
+#include <MS5611.h>
 
-#include "ms5611.h"
-#include <SPI.h>
-
-ms5611::ms5611(int cs) {
+MS5611::MS5611(int cs) {
   this->_cs = cs;
   this->n_crc = 0;
+  resetComplete = false;
 }
-void ms5611::init() {
+unsigned char MS5611::init() {
   pinMode(this->_cs, OUTPUT);
   digitalWrite(this->_cs, HIGH);
-  cmd_reset(); // reset the module after powerup
+  if(!resetComplete)
+    cmd_reset(); // reset the module after powerup
   for (int i = 0; i < 8; i++) {
     C[i] = cmd_prom(i); // read calibration coefficients
   }
   return (n_crc = crc4(C));
 }
 
-unsigned long ms5611::cmd_adc(char cmd) {
-  SPISettings settingsA(1000000, MSBFIRST, SPI_MODE0);
+unsigned long MS5611::cmd_adc(char cmd) {
+  SPISettings settingsA(10000000, MSBFIRST, SPI_MODE0);
   unsigned int ret;
   unsigned long temp;
   SPI.beginTransaction(settingsA);
   digitalWrite(this->_cs, LOW);
-  delay(2); // Delay needed here!
+  delay(1); // Delay needed here!
   SPI.transfer(CMD_ADC_CONV + cmd);
   digitalWrite(this->_cs, HIGH);
+  SPI.endTransaction();
   switch (cmd & 0x0f) // wait necessary conversion time
   {
     
@@ -52,72 +53,99 @@ unsigned long ms5611::cmd_adc(char cmd) {
     case CMD_ADC_4096: delay(10); break;
     */
   }
-
+SPI.beginTransaction(settingsA);
   digitalWrite(this->_cs, LOW);
-  delay(2); // Delay needed here!
+  delay(1); // Delay needed here!
   SPI.transfer(CMD_ADC_READ);
   ret = SPI.transfer(0x00);
-  temp = 65536 * ret;
+  temp = ret << 8;
   ret = SPI.transfer(0x00);
-  temp += (256 * ret);
+  temp = temp | ret;
+  temp = temp << 8;
   ret = SPI.transfer(0x00);
-  temp += ret;
+  temp = temp | ret;
   digitalWrite(this->_cs, HIGH);
+  SPI.endTransaction();
   return temp;
 }
 
-unsigned long ms5611::getPressure() {
-  unsigned long pressure = 0;
-  pressure = cmd_adc(CMD_ADC_D1 + CMD_ADC_1024);
-  return pressure;
-
+unsigned long MS5611::getPressure(char resolution) {
+  return cmd_adc(CMD_ADC_D1 + resolution);
 }
 
-double ms5611::getPressureCompensated() {
-  long pressure = 0;
+double MS5611::getPressureCompensated(char resolution) {
+   /* long pressure = 0;
+	double P = 0;
+	pressure = cmd_adc(CMD_ADC_D1+resolution);
+	double dT=getTemperature(resolution)-C[5]*pow(2,8);
+	double OFF=C[2]*pow(2,17)+dT*C[4]/pow(2,6);
+	double SENS=C[1]*pow(2,16)+dT*C[3]/pow(2,7);
+	P=(((pressure*SENS)/pow(2,21)-OFF)/pow(2,15))/100;
+	return P;
+    */
   double P = 0;
-  pressure = cmd_adc(CMD_ADC_D1 + CMD_ADC_1024);
-  double dT = getTemperature() - C[5] * pow(2, 8);
-  double OFF = C[2] * pow(2, 17) + dT * C[4] / pow(2, 6);
-  double SENS = C[1] * pow(2, 16) + dT * C[3] / pow(2, 7);
-  P = (((pressure * SENS) / pow(2, 21) - OFF) / pow(2, 15)) / 100;
-  return P;
+  double dT = getTemperature(resolution) - C[5] * pow(2, 8);
+  double OFF = C[2] * pow(2, 16) + C[4] * dT / pow(2, 7);
+  double SENS = C[1] * pow(2, 15) + C[3] * dT / pow(2, 8);
+  P = (getPressure(resolution) * SENS / pow(2, 21) - OFF) / pow(2, 15);
+  
+  return P/100;
 }
 
-unsigned long ms5611::getTemperature() {
-  unsigned long temperature;
-  temperature = cmd_adc(CMD_ADC_D2 + CMD_ADC_1024);
-  return temperature;
-
+unsigned long MS5611::getTemperature(char resolution) {
+  return cmd_adc(CMD_ADC_D2 + resolution);
 }
 
-double ms5611::getTemperatureCompensated() {
+double MS5611::getTemperatureCompensated(char resolution) {
   unsigned long temperature = 0;
   double T = 0;
-  temperature = cmd_adc(CMD_ADC_D2 + CMD_ADC_1024);
-  double dT = getTemperature() - C[5] * pow(2, 8);
-  double OFF = C[2] * pow(2, 17) + dT * C[4] / pow(2, 6);
-  double SENS = C[1] * pow(2, 16) + dT * C[3] / pow(2, 7);
-  T = (2000 + (dT * C[6]) / pow(2, 23)) / 100;
-  return T;
+  double dT = getTemperature(resolution) - C[5] * pow(2, 8);
+  T = 2000 + (dT * C[6]) / pow(2, 23);
+  //double OFF = C[2] * pow(2, 16) + dT * C[4] / pow(2, 7);
+  //double SENS = C[1] * pow(2, 15) + dT * C[3] / pow(2, 8);
+  return T/100;
 }
 
-void ms5611::cmd_reset()
-{
+double MS5611::getSecondOrderTemperatureCompensated(char resolution){
+  double TEMP, dT, OFF, SENS, T2, OFF2, SENS2 = 0;
+  dT = getTemperature(resolution) - C[5] * pow(2, 8);
+  TEMP = 2000 + dT * C[6] / pow(2, 23);
+  OFF = C[2] * pow(2, 16) + dT * C[4] / pow(2, 7);
+  SENS = C[1] * pow(2, 15) + dT * C[3] / pow(2, 8);
+  if(TEMP<20){
+      T2 = pow(dT, 2) / pow(2, 31);
+      OFF2 = 5 * pow(TEMP-2000, 2) / pow(2, 1);
+      SENS2 = 5 * pow(TEMP-2000, 2) / pow(2, 2);
+      if(TEMP<-15){
+          OFF2 = OFF2 + 7 * pow(TEMP+1500, 2);
+          SENS2 = SENS2 + 11 * pow(TEMP+1500, 2) / pow(2, 1);
+      }
+  }
+    TEMP = TEMP - T2;
+    OFF = OFF - OFF2;
+    SENS = SENS - SENS2;
+    return TEMP/100;
+}
+
+void MS5611::cmd_reset()
+{   
   digitalWrite(this->_cs, LOW); // pull CSB low to start the command
+  delay(1);
   SPI.transfer(CMD_RESET); // send reset sequence
-  delayMicroseconds(5); // wait for the reset sequence timing
+  delay(10); // wait for the reset sequence timing
   digitalWrite(this->_cs, HIGH); // pull CSB high to finish the command
+  resetComplete=true;
+  Serial.println("Reset complete");
 }
 
-unsigned int ms5611::cmd_prom(char coef_num)
+unsigned int MS5611::cmd_prom(char coef_num)
 {
 #ifdef DEBUGSERIAL
   Serial.print("PROM "); Serial.print((uint8_t)coef_num, DEC); Serial.print(": ");
 #endif
   SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0));
   digitalWrite(this->_cs, LOW); // pull CSB low
-  delay(5);  // Delay needed here!
+  delay(2);  // Delay needed here!
   SPI.transfer(CMD_PROM_RD + ((uint8_t)coef_num) * 2); // send PROM READ command
   unsigned int ret;
   unsigned int rC = 0;
@@ -125,12 +153,12 @@ unsigned int ms5611::cmd_prom(char coef_num)
 #ifdef DEBUGSERIAL
   Serial.print(ret, HEX);
 #endif
-  rC = 256 * ret;
+  rC = ret << 8;
   ret = SPI.transfer(0x00); // send 0 to read the LSB
 #ifdef DEBUGSERIAL
   Serial.print(ret, HEX);
 #endif
-  rC = rC + ret;
+  rC = rC | ret;
 #ifdef DEBUGSERIAL
   Serial.print(" : ");
   Serial.println(rC);
@@ -140,7 +168,7 @@ unsigned int ms5611::cmd_prom(char coef_num)
   return rC;
 }
 
-unsigned char ms5611::crc4(unsigned int n_prom[])
+unsigned char MS5611::crc4(unsigned int n_prom[])
 {
   int cnt; // simple counter
   unsigned int n_rem; // crc reminder
@@ -168,4 +196,24 @@ unsigned char ms5611::crc4(unsigned int n_prom[])
   n_rem = (0x000F & (n_rem >> 12)); // // final 4-bit reminder is CRC code
   n_prom[7] = crc_read; // restore the crc_read to its original place
   return (n_rem ^ 0x00);
+}
+
+void MS5611::setStationPressure(){
+    stationPressure = getPressureCompensated(CMD_ADC_4096);
+}
+
+double MS5611::convertMBtoMeters(double mb){
+     return convertMBtoFt(mb)*.3048;
+}
+double MS5611::getAltitude(){
+    return getAltitude(CMD_ADC_1024);
+}
+double MS5611::getAltitude(char resolution){
+    return (1-pow(getPressureCompensated(resolution)/stationPressure, 0.190284))*145366.45;
+}
+double MS5611::convertMBtoFt(double mb){
+    return (1-pow(mb/1013.25, 0.190284))*145366.45;
+}
+double MS5611::convertCtoF(double temp){
+    return temp*9/5+32;
 }
