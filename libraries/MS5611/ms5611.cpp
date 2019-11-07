@@ -7,6 +7,7 @@
 MS5611::MS5611(int cs) {
   _cs = cs;
   n_crc = 0;
+  stationPressure = 1013.251; // Offset because if initially called at .25 it will return infinite altitude.
   resetComplete = false;
 }
 unsigned char MS5611::init() {
@@ -118,7 +119,6 @@ void MS5611::cmd_reset()
   SPI.endTransaction();
   delay(10); // Need delay here to finish reboot!
   resetComplete=true;
-  Serial.println("Reset complete");
 }
 
 unsigned int MS5611::cmd_prom(char coef_num)
@@ -184,9 +184,10 @@ double MS5611::setStationPressure(){
     double average=0;
     int x;
     for(x=0; x<5; ++x){
-        double += getPressureCompensated(CMD_ADC_4096))/5;
+        average += getPressureCompensated(CMD_ADC_4096)/5;
+        delay(10);
     }
-    return average
+    return (stationPressure = average);
 }
 
 double MS5611::convertMBtoMeters(double mb){
