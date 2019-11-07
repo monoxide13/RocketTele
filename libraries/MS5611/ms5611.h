@@ -4,7 +4,7 @@
  *  Created on: Jun 26, 2018
  *      Author: kbisland
  */
-#define DEBUGSERIAL
+//#define DEBUGSERIAL
 
 #ifndef SRC_MS5611_H_
 #define SRC_MS5611_H_
