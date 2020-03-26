@@ -214,7 +214,7 @@ void setup() {
 #endif // End SD card init
   delay(1000);
   stageLoopCount = 1;
-  stage = 0;
+  stage = 1;
   buzzerCount = 0;
 }
 
@@ -222,50 +222,33 @@ void setup() {
 void loop() {
   loopTime = millis();
   switch (stage) {
-    case 0:
-      if (stageLoopCount == 1) {
-#ifdef OUTPUT_USB
-        Serial.println("-Stage 0 start");
-#endif
-#ifdef USE_TELE
-        TELE_TX("C00C00");
-#endif
-        updateTime = 0;
-        buzzerCount = 0;
-      }
-      if (updateTime <= loopTime) {
-        if (buzzerState) {
-          buzzerState = false;
-          digitalWrite(BUZZER_PIN, LOW);
-        } else {
-          buzzerState = true;
-          digitalWrite(BUZZER_PIN, HIGH);
-          ++buzzerCount;
-        }
-        updateTime = loopTime + 500;
-        if (buzzerCount >= INITDELAY) {
-          stage = 1;
-          stageLoopCount = 0;
-        }
-      }
-      break;
-    /* Case 1
-       Preflight.
-    */
     case 1:
       if (stageLoopCount == 1) {
 #ifdef OUTPUT_USB
         Serial.println("-Stage 1 start");
 #endif
-
 #ifdef USE_TELE
-        TELE_TX("C10C10"); // Start initialization.
+        TELE_TX("C10C10");
 #endif
-        updateTime = millis() + 5000;
+        updateTime = 0;
+        buzzerCount = 0;
       }
-      if (millis() > updateTime) {
-        stage = 2;
-        stageLoopCount = 0;
+      // Buzzer is on for 1 second, off for 2.
+      if (updateTime <= loopTime) {
+        if (!buzzerState) {
+          buzzerState = true;
+          digitalWrite(BUZZER_PIN, HIGH);
+          updateTime=loopTime+1000;
+        } else {
+          buzzerState = false;
+          digitalWrite(BUZZER_PIN, LOW);
+          updateTime=loopTime+2000;
+          ++buzzerCount;
+        }
+        if (buzzerCount > INITDELAY/3) {
+          stage = 1;
+          stageLoopCount = 0;
+        }
       }
       break;
     /* Case 2

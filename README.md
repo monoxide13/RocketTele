@@ -42,7 +42,7 @@ If you don't want to use serial usb output (used mainly for testing), comment ou
 System operation is a 8 step process.
 	1. Check if SD is inserted. If so, initialize and enable logging. If telemetry enabled, initialize and begin transmitting.
 	2. Delay for 30 seconds to allow for all hatches to be closed and rocket to be stable on launch pad.
-	2. Alternative method, wait for telemetry to trigger start-up. Use "#define USE_TELE".
+	2. TODO: Alternative method, wait for telemetry to trigger start-up. Use "#define USE_MANUALSTART". 
 	3. Start and calibrate sensors. Wait until they are ready.
 	4. Wait for launch.
 	5. Rocket on ascent.

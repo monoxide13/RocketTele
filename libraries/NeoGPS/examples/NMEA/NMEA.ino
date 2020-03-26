@@ -105,7 +105,6 @@ static void GPSloop()
     fix = gps.read();
     doSomeWork();
   }
-
 } // GPSloop
 
 //--------------------------
