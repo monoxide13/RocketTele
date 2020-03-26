@@ -40,15 +40,15 @@ If you don't want to use SD cards, comment out "#define OUTPUT_SD".
 If you don't want to use serial usb output (used mainly for testing), comment out "#define OUTPUT_USB".
 
 System operation is a 8 step process.
-	1. Check if SD is inserted. If so, initialize and enable logging. If telemetry enabled, initialize and begin transmitting.
-	2. Delay for 30 seconds to allow for all hatches to be closed and rocket to be stable on launch pad.
-	2. TODO: Alternative method, wait for telemetry to trigger start-up. Use "#define USE_MANUALSTART". 
-	3. Start and calibrate sensors. Wait until they are ready.
-	4. Wait for launch.
-	5. Rocket on ascent.
-	6. Apogee
-	7. Rocket on Descent.
-	8. Flight over.
+1. Check if SD is inserted. If so, initialize and enable logging. If telemetry enabled, initialize and begin transmitting.
+2. Delay for 30 seconds to allow for all hatches to be closed and rocket to be stable on launch pad.
+	- TODO: Alternative method, wait for telemetry to trigger start-up. Use "#define USE_MANUALSTART". 
+3. Start and calibrate sensors. Wait until they are ready.
+4. Wait for launch.
+5. Rocket on ascent.
+6. Apogee
+7. Rocket on Descent.
+8. Flight over.
 	
 
 The rocket part consists of a [Adafruit Feather M0 Logger](https://www.adafruit.com/product/2796 "Adafruit Feather M0 Logger"), [GPS receiver](https://www.banggood.com/GPS-Module-with-Ceramic-Antenna-GPS-Receiver-TTL9600-Ublox-Module-for-Multirotor-p-1100984.html?rmmds=myorder&cur_warehouse=CN), [accelerometer](https://www.banggood.com/6DOF-MPU-6050-3-Axis-Gyro-With-Accelerometer-Sensor-Module-For-Arduino-p-80862.html?rmmds=myorder&cur_warehouse=USA), [barometer](https://www.banggood.com/MS5611-GY-63-Atmospheric-Pressure-Sensor-Module-IICSPI-Communication-p-965980.html?rmmds=myorder&cur_warehouse=CN), and [serial transmitter](https://www.banggood.com/HC-12-433-SI4463-Wireless-Serial-Module-Remote-1000M-With-Antenna-p-973522.html?rmmds=myorder&cur_warehouse=USA).
