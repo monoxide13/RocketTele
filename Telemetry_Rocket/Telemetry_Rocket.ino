@@ -191,7 +191,7 @@ void setup() {
       TELE_TX("S36S36"); // Send SD not present.
 #endif
 #ifdef OUTPUT_USB
-      Serial.println("-SD Card not able to start.");
+      Serial.println("SD Card not able to start.");
 #endif
       sensors.sd = 6;
     } // end SD.begin
@@ -200,7 +200,7 @@ void setup() {
     TELE_TX("S31S31"); // Send SD not present.
 #endif
 #ifdef OUTPUT_USB
-    Serial.println("-SD Card not present.");
+    Serial.println("SD Card not present.");
 #endif
     sensors.sd = 1;
   } // end SD present
@@ -209,7 +209,7 @@ void setup() {
   TELE_TX("S31S31"); // Send SD not present/used.
 #endif
 #ifdef OUTPUT_USB
-  Serial.println("-SD Card disabled.");
+  Serial.println("SD Card disabled.");
 #endif
 #endif // End SD card init
   delay(1000);
@@ -371,7 +371,8 @@ void loop() {
               {
                 sensors.gps = 1;
 #ifdef OUTPUT_USB
-                Serial.println("No valid GPS data found. Not using.");
+                Serial.println("No valid GPS fix data found. Not using.");
+                // TODO: For now until I understand how this works, just ignore any value that errors.
 #endif
               }
               break;
@@ -385,13 +386,19 @@ void loop() {
               }
               break;
             case 4:
-              /* Looking for GPS. If locked on set 5. */
+              /* Looking for GPS. If position locked, sensor is ready. Set 5. */
               if (gpsFix.valid.location) {
                 sensors.gps = 5;
 #ifdef OUTPUT_USB
-                Serial.println("GPS Location found:");
+                Serial.println("GPS location found:");
                 Serial.printf("%l, %l\nAlt: %f, SatsInUse:%d\n",
                               gpsFix.latitudeL(), gpsFix.longitudeL(), gpsFix.altitude(), gpsFix.satellites);
+#endif
+#ifdef OUTPUT_SD
+                if(sdOpen){
+                  logFile.printf("-GPS location found. Data; Lat:%l, Long:%l Alt:%f, SatsInUse:%d\n",
+                  gpsFix.latitudeL(), gpsFix.longitudeL(), gpsFix.altitude(), gpsFix.satellites);
+                }
 #endif
               }
               break;

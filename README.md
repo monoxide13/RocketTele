@@ -35,9 +35,11 @@ I2Cdev and MPU6050 code attributed to jrowberg.
 **System two**
 ...Work in progress...
 This is a two part system. Part one is the rocket part, including transmitter. Part two is the reciever.
-If you don't want to use the transmitter/reciever setup, comment out "#define OUTPUT_TELE".
-If you don't want to use SD cards, comment out "#define OUTPUT_SD".
-If you don't want to use serial usb output (used mainly for testing), comment out "#define OUTPUT_USB".
+
+Optional defines.
+- OUTPUT_TELE : Enables use of transmitter/reciever setup.
+- OUTPUT_SD : Enables logging to SD card.
+- OUTPUT_USB : Enables serial output via USB (used mainly for testing).
 
 System operation is a 8 step process.
 1. Check if SD is inserted. If so, initialize and enable logging. If telemetry enabled, initialize and begin transmitting.
@@ -50,6 +52,32 @@ System operation is a 8 step process.
 7. Rocket on Descent.
 8. Flight over.
 	
+Telemetry outputs are:
+- C[StageNumber]0
+- S[SensorNumber][SensorStatus]
+- A[zAccelReferenceToRocket][xGyro][yGyro][zGyro]
+- B[baroAlt]
+- G[LAT][LONG][GPSALT]
+- -[Comment]
+
+SD outputs are:
+- C[StageNumber]0
+- S[SensorNumber][SensorStatus]
+- H[satelites in use][GPS Accuracy]
+- G[LAT][LONG][GPSALT]
+- E[rawXAccel][rawYAccel][rawZAccel][rawXGyro][rawYGyro][rawZGyro]
+- T[rawBaro][Temp][DewPoint]
+- -[Comment]
+
+Sensors are coded as:
+<ol start="0">
+  <li>barometer</li>
+  <li>accelerometer</li>
+  <li>GPS</li>
+  <li>SD</li>
+</ol>
+
+Serial outputs are all not parsable, and all plain comments.
 
 The rocket part consists of a [Adafruit Feather M0 Logger](https://www.adafruit.com/product/2796 "Adafruit Feather M0 Logger"), [GPS receiver](https://www.banggood.com/GPS-Module-with-Ceramic-Antenna-GPS-Receiver-TTL9600-Ublox-Module-for-Multirotor-p-1100984.html?rmmds=myorder&cur_warehouse=CN), [accelerometer](https://www.banggood.com/6DOF-MPU-6050-3-Axis-Gyro-With-Accelerometer-Sensor-Module-For-Arduino-p-80862.html?rmmds=myorder&cur_warehouse=USA), [barometer](https://www.banggood.com/MS5611-GY-63-Atmospheric-Pressure-Sensor-Module-IICSPI-Communication-p-965980.html?rmmds=myorder&cur_warehouse=CN), and [serial transmitter](https://www.banggood.com/HC-12-433-SI4463-Wireless-Serial-Module-Remote-1000M-With-Antenna-p-973522.html?rmmds=myorder&cur_warehouse=USA).
 ![alt text](https://cdn-learn.adafruit.com/assets/assets/000/046/243/original/adafruit_products_Feather_M0_Adalogger_v2.2-1.png? "AdaFruit Feather M0 Logger Pinout")
