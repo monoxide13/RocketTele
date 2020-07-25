@@ -2,7 +2,7 @@
 # RocketTele
 Arduino based live rocket telemetry and recording. There are two separate systems that can be used.
  
-**System one**
+**DataRec**
 ...Work in progress...
 This is a single on-board system that only records accel and baro data on flash/EEPROM. It is based on a SparkFun 5v Pro Micro Arduino. A switch is used to set to record or replay the flight.
 Good for short flights that there is some concern for DSE (Detectable Seismic Event). I use it when testing parachutes and parachute deployment.
@@ -32,7 +32,7 @@ XAccel			YAccel				ZAccel			XGyro			YGyro			ZGyro
 
 I2Cdev and MPU6050 code attributed to jrowberg.
 
-**System two**
+**TeleMax**
 ...Work in progress...
 This is a two part system. Part one is the rocket part, including transmitter. Part two is the reciever.
 
