@@ -7,12 +7,12 @@
 [submodule "libraries/UBLOX"]
 	path = libraries/UBLOX
 	url = https://github.com/monoxide13/UBLOX
-[submodule "TeleMax/inc/ArduinoModule-CMSIS-Atmel"]
-	path = TeleMax/inc/ArduinoModule-CMSIS-Atmel
-	url = https://github.com/arduino/ArduinoModule-CMSIS-Atmel.git
-[submodule "TeleMax/inc/ArduinoCore-samd"]
-	path = TeleMax/inc/ArduinoCore-samd
+[submodule "libraries/ArduinoCore-samd"]
+	path = libraries/ArduinoCore-samd
 	url = https://github.com/adafruit/ArduinoCore-samd.git
-[submodule "TeleMax/inc/CMSIS_5"]
-	path = TeleMax/inc/CMSIS_5
+[submodule "libraries/ArduinoModule-CMSIS-Atmel"]
+	path = libraries/ArduinoModule-CMSIS-Atmel
+	url = https://github.com/arduino/ArduinoModule-CMSIS-Atmel.git
+[submodule "libraries/CMSIS_5"]
+	path = libraries/CMSIS_5
 	url = https://github.com/ARM-software/CMSIS_5.git

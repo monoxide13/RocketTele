@@ -15,9 +15,10 @@ IDIR := $(ROOT_DIR)/inc
 SDIR := $(ROOT_DIR)/src
 ODIR := $(ROOT_DIR)/obj
 LDIR := $(ROOT_DIR)/lib
+GDIR := $(ROOT_DIR)/../libraries
 BDIR := $(ROOT_DIR)/bin
-SAMD_DIR := $(IDIR)/ArduinoCore-samd
-CMSIS_DIR := $(IDIR)/ArduinoModule-CMSIS-Atmel/CMSIS-Atmel/CMSIS/Device/ATMEL
+SAMD_DIR := $(GDIR)/ArduinoCore-samd
+CMSIS_DIR := $(GDIR)/ArduinoModule-CMSIS-Atmel/CMSIS-Atmel/CMSIS/Device/ATMEL
 
 SOURCES := $(wildcard $(addprefix $(SDIR)/, *.c *.cpp))
 HEADERS :=  $(wildcard $(addprefix $(SDIR)/, *.h *.hpp))
@@ -75,9 +76,11 @@ DEFINES := -DF_CPU=$(BOARD_BUILD_FCPU) -DARDUINO=10605 -DARDUINO_$(BOARD_BOARD) 
 # -------------------------------------------------------------------------------------------------------------
 # Add something that searches for all folders inside LDIR folder.
 INCLUDE_DIRS := $(LDIR) \
+    $(LDIR)/UBLOX/src \
+    $(LDIR)/SD/src \
 	$(wildcard $(LDIR)/*) \
-	$(IDIR)/CMSIS_5/CMSIS/Core/Include \
-	$(IDIR)/CMSIS_5/CMSIS/DSP/Include \
+	$(GDIR)/CMSIS_5/CMSIS/Core/Include \
+	$(GDIR)/CMSIS_5/CMSIS/DSP/Include \
 	$(CMSIS_DIR) \
 	$(SAMD_DIR)/cores/arduino \
 	$(SAMD_DIR)/variants/$(BOARD_BUILD_VARIANT) \
