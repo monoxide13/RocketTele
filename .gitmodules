@@ -1,0 +1,18 @@
+[submodule "libraries/i2cdevlib"]
+	path = libraries/i2cdevlib
+	url = https://github.com/jrowberg/i2cdevlib/
+[submodule "libraries/SD"]
+	path = libraries/SD
+	url = https://github.com/arduino-libraries/SD.git
+[submodule "libraries/UBLOX"]
+	path = libraries/UBLOX
+	url = https://github.com/monoxide13/UBLOX
+[submodule "TeleMax/inc/ArduinoModule-CMSIS-Atmel"]
+	path = TeleMax/inc/ArduinoModule-CMSIS-Atmel
+	url = https://github.com/arduino/ArduinoModule-CMSIS-Atmel.git
+[submodule "TeleMax/inc/ArduinoCore-samd"]
+	path = TeleMax/inc/ArduinoCore-samd
+	url = https://github.com/adafruit/ArduinoCore-samd.git
+[submodule "TeleMax/inc/CMSIS_5"]
+	path = TeleMax/inc/CMSIS_5
+	url = https://github.com/ARM-software/CMSIS_5.git
