@@ -6,7 +6,6 @@
 #include "BaseStation.hpp"
 #include "Output.hpp"
 
-
 using namespace BaseStation;
 
 Uart telePort(&sercom1, 10, 11, SercomRXPad::SERCOM_RX_PAD_0, SercomUartTXPad::UART_TX_PAD_2);
