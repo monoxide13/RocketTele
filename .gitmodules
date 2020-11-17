@@ -16,3 +16,6 @@
 [submodule "libraries/CMSIS_5"]
 	path = libraries/CMSIS_5
 	url = https://github.com/ARM-software/CMSIS_5.git
+[submodule "libraries/HC12"]
+	path = libraries/HC12
+	url = https://github.com/monoxide13/HC12.git
