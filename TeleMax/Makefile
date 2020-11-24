@@ -8,7 +8,7 @@ BOARD := adafruit_feather_m0
 DEVICE := ttyACM0
 TARGET := TeleMax
 BAUD := 230400
-RADIO := ttyUSB0
+RADIO := ttyACM0
 
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 IDIR := $(ROOT_DIR)/inc
@@ -199,5 +199,8 @@ reset:
 	@touch $(ODIR)/empty
 	rm -rf $(BDIR)/*
 	@touch $(BDIR)/empty
+
+listen:
+	tio -m INLCRNL /dev/$(RADIO)
 
 # End

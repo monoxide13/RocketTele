@@ -18,6 +18,8 @@ S_MS5611::S_MS5611(){
 	pres=0;
 	waitingLoops=0;
 	baro->init();
+	// Add some sort of check to see if sensor is working.
+	// If not working, sensors returns temp 20, pressure 0.
 	Logging::log(3, "-Initialization complete.\n");
 };
 

@@ -23,20 +23,27 @@ namespace {
 void Logging::init(){
 	ready=false;
 	loggingStatus=0;
-	#ifdef LOG_USB > 0
+	#if LOG_USB > 0
 	Serial.begin(115200);
-	//while (!Serial.available()){ delay (1);};
-	-Serial.println("-USB Debugging! Starting system...");
+	while (!Serial.available()){ delay (1);};
+	Serial.println("-USB Debugging! Starting system...");
 	loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_USB | LOGGING_STATUS_OFFSET_USB(3); 
 	#endif
 	
-	#ifdef LOG_SD > 0
+	#if LOG_SD > 0
 	openFile();
 	#endif
 
-	#ifdef LOG_DOWNLINK > 0
+	#if LOG_DOWNLINK > 0
 	downlink.init();
-	loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
+	if(downlink.testModule()){
+		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
+		#ifdef LOG_USB > 0
+			Serial.println("-Downlink OK");
+		#endif
+	}else{
+		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(2);
+	}
 	#endif
 };
 
@@ -78,17 +85,17 @@ void Logging::closeFile(){
 };
 
 void Logging::log(unsigned char level, String input){
-	#ifdef LOG_USB > 0
+	#if LOG_USB > 0
 	if( level <= LOG_USB & !(~loggingStatus & LOGGING_STATUS_MASK_USB)){
 		Serial.print(input);
 	}
 	#endif
-	#ifdef LOG_SD > 0
+	#if LOG_SD > 0
 	if( level <= LOG_SD & !(~loggingStatus & LOGGING_STATUS_MASK_SD)){
 		logFile.print(input);
 	}
 	#endif
-	#ifdef LOG_DOWNLINK > 0
+	#if LOG_DOWNLINK > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
 		downlink.send(input);
 	}
@@ -97,17 +104,17 @@ void Logging::log(unsigned char level, String input){
 }
 
 void Logging::log(unsigned char level, char* input){
-	#ifdef LOG_USB > 0
+	#if LOG_USB > 0
 	if( level <= LOG_USB & !(~loggingStatus & LOGGING_STATUS_MASK_USB)){
 		Serial.print(input);
 	}
 	#endif
-	#ifdef LOG_SD > 0
+	#if LOG_SD > 0
 	if( level <= LOG_SD & !(~loggingStatus & LOGGING_STATUS_MASK_SD)){
 		logFile.print(input);
 	}
 	#endif
-	#ifdef LOG_TELE > 0
+	#if LOG_TELE > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
 		downlink.send(input);
 	}
