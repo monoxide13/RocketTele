@@ -1,1 +1,1 @@
-change library/SD to be a submodule of arduinos SD instead of adafruits
+In S_MS5611, add connectivity check or verify operational.
