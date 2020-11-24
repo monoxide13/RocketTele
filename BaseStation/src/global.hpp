@@ -17,7 +17,7 @@
 
 #define SD_CS_PIN 4				// SERCOM0+2.0 SD Chip select
 #define SD_CD_PIN 7				// SERCOM3+5.3 SD Card Detect
-#define HC12_SET_PIN 19			// HC12 serial TX/RX command mode pin. A7.
+#define HC12_SET_PIN 5			// HC12 serial TX/RX command mode pin.
 #define VOLTAGE_PIN	A7			// Battery voltage. 2v fully charged. aR()*6.6/1024 
 #define PACKET_LED_PIN 13		// Also onboard LED
 #define READY_LED_PIN 13		// Also onboard LED

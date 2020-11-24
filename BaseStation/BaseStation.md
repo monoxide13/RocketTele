@@ -1,8 +1,5 @@
-Prerequisites:
-- [Arm Compiler (gcc-arm-none-eabi)](https://packages.debian.org/buster/gcc-arm-none-eabi)
-- [bossa-cli: command line programmer](https://downloads.arduino.cc/bossac-1.6.1-arduino-x86_86-linux-gnu.tar.gz) - I'm using version 1.7 that came with the latest arduino release. Version 1.8 and up I couldn't get to upload. Also can be downloaded from [github](https://github.com/shumateck/BOSSA).
-- [Arduino SAMD Library](https://github.com/adafruit/arduino-board-index/blob/gh-pages/boards/adafruit-samd-1.6.1.tar.bz2)
-- [CMSIS: Arm Cortex librarys](https://github.com/ARM-software/CMSIS_5)
-- [CMSIS: Arduino Arm Cortex Librarys](https://github.com/arduino/ArduinoModule-CMSIS-Atmel)
+# BaseStation
 
-I want to use the Library from Atmel, but I believe the Arduino Library protects the bootloader. Not sure on this, but I want to keep the bootloader until I know more.
+## Info
+This code also runs on an Adafruit Feather M0. Mine runs on the logger version, but it doesn't need to. All the Feather is doing is reading the packets from the HC12 and outputting them via serial to PC.
+An Arduino would work fine, but I wanted to use a feather so I could incoorperate 2 hardware serial ports and an LCD.
