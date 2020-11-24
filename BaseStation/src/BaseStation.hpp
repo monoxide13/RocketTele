@@ -14,5 +14,4 @@ namespace BaseStation{
 	extern Output systemLed;
 	void heartbeat();
 };
-extern Uart telePort;
 extern HC12 rocket;
