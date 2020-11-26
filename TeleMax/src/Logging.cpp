@@ -17,7 +17,9 @@ namespace {
 	char loggingStatus;
 	bool ready; // A faster temp way to know if files open.
 	File logFile;
+	#if LOG_DOWNLINK > 0
 	HC12 downlink(&Serial1, HC12_SET_PIN);
+	#endif
 }
 
 void Logging::init(){
@@ -38,7 +40,7 @@ void Logging::init(){
 	downlink.init();
 	if(downlink.testModule()){
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
-		#ifdef LOG_USB > 0
+		#if LOG_USB > 0
 			Serial.println("-Downlink OK");
 		#endif
 	}else{

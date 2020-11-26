@@ -14,7 +14,7 @@
 * 3 - Maximum. Use only for debugging.
 */
 // Output telemetry over downlink port
-#define LOG_DOWNLINK 1
+#define LOG_DOWNLINK 0
 // Output telemetry to SD card
 #define LOG_SD 0
 // Prefix filename for SD recording. 6 char max.
