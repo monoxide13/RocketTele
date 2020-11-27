@@ -44,6 +44,7 @@ void setup(void){
 
 	/*** Start the bus ***/
 	Wire.begin();
+	SPI.begin();
 
 	/*** Start logging ***/
 	Logging::init();
