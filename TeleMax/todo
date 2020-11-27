@@ -1,1 +1,2 @@
 In S_MS5611, add connectivity check or verify operational.
+S_MS5611 does no temp reading. It would be nice to once a second update temp as well as pressure. Since pressure is primary reading and should not be missed, what's the best way to handle this?

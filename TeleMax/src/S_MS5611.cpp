@@ -77,7 +77,8 @@ void S_MS5611::tick(){
 double S_MS5611::getMeasurement(){
 	readingReady=false;
 	Logging::log(3, "-MS5611: waitingLoops:" + String(waitingLoops) + " readingLoops:" + String(readingLoops) + "\n");
-	Logging::log(1, "B:" + String(baro->calculatePressureCompensation(pres, temp)) + "," + String(baro->getAltitude(pres, temp)) + "," + String(temp) + "," + String(pres) +  "\n");
+	// I'm logging the first order temp compensation. The second could be used for more accuracy, but I'm wanting to save a few cpu cycles.
+	Logging::log(1, "B:" + String(baro->getAltitude(pres, temp)) + "," + String(baro->calculateTemperatureCompensation) + "," + String(baro->calculatePressureCompensation) +  "\n");
 	waitingLoops=0;
 	readingLoops=0;
 	return 0;
