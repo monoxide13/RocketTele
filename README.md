@@ -79,7 +79,7 @@ Sensors are coded as:
 
 Serial outputs are all not parsable, and all plain comments.
 
-The rocket part consists of a [Adafruit Feather M0 Logger](https://www.adafruit.com/product/2796 "Adafruit Feather M0 Logger"), [GPS receiver](https://www.banggood.com/GPS-Module-with-Ceramic-Antenna-GPS-Receiver-TTL9600-Ublox-Module-for-Multirotor-p-1100984.html?rmmds=myorder&cur_warehouse=CN), [accelerometer](https://www.banggood.com/6DOF-MPU-6050-3-Axis-Gyro-With-Accelerometer-Sensor-Module-For-Arduino-p-80862.html?rmmds=myorder&cur_warehouse=USA), [barometer](https://www.banggood.com/MS5611-GY-63-Atmospheric-Pressure-Sensor-Module-IICSPI-Communication-p-965980.html?rmmds=myorder&cur_warehouse=CN), and [serial transmitter](https://www.banggood.com/HC-12-433-SI4463-Wireless-Serial-Module-Remote-1000M-With-Antenna-p-973522.html?rmmds=myorder&cur_warehouse=USA).
+The rocket part consists of a [Adafruit Feather M0 Logger](https://www.adafruit.com/product/2796 "Adafruit Feather M0 Logger"), [GPS receiver](https://www.banggood.com/GPS-Module-with-Ceramic-Antenna-GPS-Receiver-TTL9600-Ublox-Module-for-Multirotor-p-1100984.html?rmmds=myorder&cur_warehouse=CN), [accelerometer](https://www.banggood.com/6DOF-MPU-6050-3-Axis-Gyro-With-Accelerometer-Sensor-Module-For-Arduino-p-80862.html?rmmds=myorder&cur_warehouse=USA), [barometer](https://www.banggood.com/MS5611-GY-63-Atmospheric-Pressure-Sensor-Module-IICSPI-Communication-p-965980.html?rmmds=myorder&cur_warehouse=CN), and tx/rx for telemetry (see below).
 ![alt text](https://cdn-learn.adafruit.com/assets/assets/000/046/243/original/adafruit_products_Feather_M0_Adalogger_v2.2-1.png? "AdaFruit Feather M0 Logger Pinout")
 The base site consists of another serial transmitter and an arduino to control the transmitter and forward the serial log.
 
@@ -88,7 +88,8 @@ MPU6050 library is taken from [jrowberg](https://github.com/jrowberg/i2cdevlib/t
  - I did have to make a few changes to the MPU6050 lib. Changes were added to MPU6050.cpp.
  - I added "#define BUFFER_LENGTH SERIAL_BUFFER_SIZE" to convert it from AVR to ARM phrasing.
  - I included the [dtostrf](https://forum.arduino.cc/index.php?topic=632384.0) function.
-HC12 library is pieced together from many places, including much of my own work.
+HC12 library is pieced together from many places, including much of my own work. *No longer used*
+RFM9x library is from [mikem](https://airspayce.com/mikem/arduino/RadioHead/).
 MS5611 library was written by [keionbis](https://github.com/keionbis/ms5611_SPI), with it being reworked by myself.
 UBLOX library was done by [bolderflight](https://github.com/bolderflight/UBLOX).
 I2Cdev, SD, SPI are all Arduino libraries.
