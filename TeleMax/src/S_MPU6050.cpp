@@ -7,8 +7,7 @@
 
 S_MPU6050::S_MPU6050(){
 	accel = new MPU6050(MPU6050_ADDRESS);
-	sensorStatus=0;
-	sensorReady=false;
+	sensorStatus=3;
 	TeleMax::dataReady=false;
 	accel->initialize();
 	Logging::log(3, "Testing accel MPU6050 connection... ");
@@ -28,6 +27,7 @@ S_MPU6050::S_MPU6050(){
 	packetSize = accel->dmpGetFIFOPacketSize();
 	Logging::log(3, "DMP Initialized. Ready for calibration.\n");
 	counter=0;
+	sensorStatus=1;
 };
 
 S_MPU6050::~S_MPU6050(){
@@ -35,6 +35,10 @@ S_MPU6050::~S_MPU6050(){
 };
 
 short S_MPU6050::initialize(){
+	if(sensorStatus==3){
+		Logging::log(2, "-MPU6050 init error\n");
+		return -1;
+	}
 	Logging::log(3,"-MPU6050 starting calibration.\n");
 	Logging::log(3,"-> = Starting loop.\n");
     Logging::log(3,"-* = Error too great, retrying different values.\n");
@@ -43,11 +47,10 @@ short S_MPU6050::initialize(){
 	accel->CalibrateGyro(6);
 	Logging::log(3, "\n-MPU6050 calibration complete.\n");
 	accel->setFullScaleAccelRange(3);
-	sensorReady=true;
 	accel->setDMPEnabled(true);
 	attachInterrupt(digitalPinToInterrupt(MPU6050_INT_PIN), TeleMax::dmpDataReady, RISING);
 	dmpReady=true;
-	sensorReady=true;
+	sensorStatus=0;
 	return 0;
 };
 

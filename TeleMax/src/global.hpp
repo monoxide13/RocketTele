@@ -14,7 +14,7 @@
 * 3 - Maximum. Use only for debugging.
 */
 // Output telemetry over downlink port
-#define LOG_DOWNLINK 0
+#define LOG_DOWNLINK 2
 // Output telemetry to SD card
 #define LOG_SD 0
 // Prefix filename for SD recording. 6 char max.
@@ -27,7 +27,7 @@
 /*----- SENSOR CONFIGURATION -----*/
 // Delay in seconds after turning on before starting sensor initialization and zeroing.
 // Should be long enough to have to the rocket closed up and on the pad.
-#define INIT_DELAY 10
+#define INIT_DELAY 3
 
 /*----- ARDUINO PINS AND ADDRESSING -----*/ 
 // MOSI							// SERCOM4.2

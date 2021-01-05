@@ -3,7 +3,7 @@
 #include "Sensor.hpp"
 
 short Sensor::initialize(){
-	sensorReady=false;
+	sensorStatus=1;
 	return 1;
 };
 
@@ -12,4 +12,8 @@ void Sensor::tick(){
 
 double Sensor::getMeasurement(){
 	return 0;
+};
+
+unsigned char Sensor::getSensorStatus(){
+	return sensorStatus;
 };

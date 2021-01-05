@@ -61,7 +61,6 @@ void setup(void){
 	pinPeripheral(10, PIO_SERCOM); // TX
 	pinPeripheral(11, PIO_SERCOM); // RX
 	
-
 	/*** Set initial values ***/
 	Logging::log(3, "-Setting initial values.\n");
 	stage=STAGE_INIT;

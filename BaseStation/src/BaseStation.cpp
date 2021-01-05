@@ -28,21 +28,19 @@ void setup(void){
 	/*** Start the serial ports ***/
 	Serial.begin(9600);
 	while(!Serial.available()){};
-	Serial.println("Starting...");
+	Serial.println("+Starting...");
 	rocket.init();
 	pinPeripheral(10, PIO_SERCOM); // TX
 	pinPeripheral(11, PIO_SERCOM); // RX
-
-	rocket.setDefaults();
-	Serial.println("Defaults set");
-	if(rocket.testModule()){
-		Serial.println("Module OK");
-	}else{
-		Serial.println("Module not OK");
-	}
-
-
+	
 	/*** Set initial values ***/
+	rocket.setDefaults();
+	Serial.println("+Defaults set");
+	if(rocket.testModule()){
+		Serial.println("+Module OK");
+	}else{
+		Serial.println("+Module not OK");
+	}
 	readyLed.turnOff();
 	debugLed.turnOff();
 	systemLed.repeat({1,0});
@@ -53,13 +51,15 @@ void loop(void){
 	heartbeat();
 	rocket.receive();
 	if(rocket.readReady){
+		packetLed.turnOn();
 		systemLed.turnOn();
 		Serial.print(rocket.lastRead + "\n");
 		rocket.readReady=false;
 		/* Check messages for sensor command to determine if rocket is ready for launch */
 		if(rocket.lastRead.startsWith("C:")){
 			int val = rocket.lastRead.indexOf(rocket.lastRead.indexOf(',')+1);
-			//Serial.println("-Rocket ready: " + rocket.lastRead[val+1]);
+			if(val == STAGE_PRELAUNCH)
+				readyLed.turnOn();
 		}
 		systemLed.turnOff();
 	}

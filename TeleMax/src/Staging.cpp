@@ -16,6 +16,7 @@ unsigned long Staging::nextMeasurementTime;
 void Staging::stage_STAGE_INIT(){
 	// Initialize the sensors and calibrate
 	SensorGroup::initialize();
+	nextMeasurementTime = TeleMax::loopTime + 1000000/LOG_RATE;
 	stage=STAGE_PRELAUNCH;
 	stageChange=true;
 };

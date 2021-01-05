@@ -15,11 +15,13 @@ class S_MS5611 : public virtual Sensor{
 	double getMeasurement() override;
 	private:
 	MS5611* baro;
+	unsigned long tempReadTime;
+	bool tempReadInProgress;
 	bool readingInProgress;
 	bool readingReady;
 	char cmd;
 	unsigned long temp;
 	unsigned long pres;
-	unsigned long waitingLoops;
 	unsigned long readingLoops;
+	unsigned long readyLoops;
 };

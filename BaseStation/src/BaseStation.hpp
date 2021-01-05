@@ -9,6 +9,7 @@
 namespace BaseStation{
 	extern unsigned long loopTime;
 	extern Output packetLed;
+	extern unsigned long packetTime;
 	extern Output readyLed;
 	extern Output debugLed;
 	extern Output systemLed;

@@ -27,7 +27,7 @@ void Logging::init(){
 	loggingStatus=0;
 	#if LOG_USB > 0
 	Serial.begin(115200);
-	while (!Serial.available()){ delay (1);};
+	//while (!Serial.available()){ delay (1);};
 	Serial.println("-USB Debugging! Starting system...");
 	loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_USB | LOGGING_STATUS_OFFSET_USB(3); 
 	#endif
