@@ -41,7 +41,7 @@ RH_RF95::RH_RF95(uint8_t slaveSelectPin, uint8_t interruptPin, RHGenericSPI& spi
 }
 
 bool RH_RF95::init()
-{
+{	
     if (!RHSPIDriver::init())
 	return false;
 

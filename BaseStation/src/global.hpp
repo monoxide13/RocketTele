@@ -15,14 +15,16 @@
 // GPS TX 10					// SERCOM1+3.2
 // D9, AIN 7				// SERCOM0.3 Battery voltage. 2v fully charge.
 
-#define SD_CS_PIN 4				// SERCOM0+2.0 SD Chip select
-#define SD_CD_PIN 7				// SERCOM3+5.3 SD Card Detect
-#define HC12_SET_PIN 5			// HC12 serial TX/RX command mode pin.
 #define VOLTAGE_PIN	A7			// Battery voltage. 2v fully charged. aR()*6.6/1024 
 #define PACKET_LED_PIN 13		// Also onboard LED
 #define READY_LED_PIN 13		// Also onboard LED
 #define SYSTEM_LED_PIN 13		// Also onboard LED
-#define SYSTEM2_LED_PIN 8		// Second led onboard. No physical pin.
+#define SYSTEM2_LED_PIN 13		// Second led onboard. No physical pin.
+#define RF95_CS_PIN 8
+#define RF95_RST_PIN 4
+#define RF95_IRQ0_PIN 3
+//#define RF95_IRQ1_PIN 3
+//#define RF95_IRQ2_PIN 3
 
 
 /*----- ROCKET STAGES OF FLIGHT -----*/

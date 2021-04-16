@@ -5,64 +5,66 @@
 #include "global.hpp"
 #include "BaseStation.hpp"
 #include "Output.hpp"
+#include "Telemetry.hpp"
+#include "LiquidCrystal_I2C.h"
 
 using namespace BaseStation;
-
-HC12 rocket = HC12(&Serial1, HC12_SET_PIN);
 
 unsigned long BaseStation::loopTime=0;
 Output BaseStation::packetLed = Output(PACKET_LED_PIN);
 Output BaseStation::readyLed = Output(READY_LED_PIN);
 Output BaseStation::debugLed = Output(SYSTEM_LED_PIN);
 Output BaseStation::systemLed = Output(SYSTEM2_LED_PIN);
+Telemetry BaseStation::telemetry; 
+LiquidCrystal_I2C lcd(0x20, 16, 2);
 
 void setup(void){
 	/*** Configure pins ***/
-	pinMode(SD_CS_PIN, OUTPUT);
-	digitalWrite(SD_CS_PIN, HIGH);
-	pinMode(SD_CD_PIN, INPUT_PULLUP);
-	pinMode(HC12_SET_PIN, OUTPUT);
-	digitalWrite(HC12_SET_PIN, HIGH);
+	pinMode(RF95_CS_PIN, OUTPUT);
+	digitalWrite(RF95_CS_PIN, HIGH);
+	pinMode(RF95_RST_PIN, OUTPUT);
+	digitalWrite(RF95_RST_PIN, HIGH);
 	pinMode(VOLTAGE_PIN, INPUT);
+	
+	/*** Start the bus ***/
+	Wire.begin();
+	SPI.begin();
 
 	/*** Start the serial ports ***/
 	Serial.begin(9600);
 	while(!Serial.available()){};
 	Serial.println("+Starting...");
-	rocket.init();
 	pinPeripheral(10, PIO_SERCOM); // TX
 	pinPeripheral(11, PIO_SERCOM); // RX
+
 	
 	/*** Set initial values ***/
-	rocket.setDefaults();
-	Serial.println("+Defaults set");
-	if(rocket.testModule()){
-		Serial.println("+Module OK");
-	}else{
-		Serial.println("+Module not OK");
-	}
+	lcd.init();
+	lcd.backlight();
 	readyLed.turnOff();
 	debugLed.turnOff();
 	systemLed.repeat({1,0});
+	Serial.println("+Starting Telemetry");
+	if(!telemetry.init()){
+		Serial.println("+Downlink OK");
+	}else{
+		Serial.println("+Downlink BAD");
+	}
+	lcd.clear();
+	lcd.print("Ready");
+	delay(5000);
 };
 
 void loop(void){
 	loopTime = micros();
-	heartbeat();
-	rocket.receive();
-	if(rocket.readReady){
-		packetLed.turnOn();
-		systemLed.turnOn();
-		Serial.print(rocket.lastRead + "\n");
-		rocket.readReady=false;
-		/* Check messages for sensor command to determine if rocket is ready for launch */
-		if(rocket.lastRead.startsWith("C:")){
-			int val = rocket.lastRead.indexOf(rocket.lastRead.indexOf(',')+1);
-			if(val == STAGE_PRELAUNCH)
-				readyLed.turnOn();
-		}
-		systemLed.turnOff();
+	telemetry.receive();
+	if(Serial.available()){
+		Serial.read();
 	}
+	lcd.clear();
+	lcd.print(loopTime);
+	delay(1000);
+	heartbeat();
 };
 
 inline void BaseStation::heartbeat(){

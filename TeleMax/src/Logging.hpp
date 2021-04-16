@@ -11,7 +11,7 @@ namespace Logging{
 	void openFile();
 	void closeFile();
 	void log(unsigned char, String);
-	void log(unsigned char, char*);
+	void log(unsigned char, char*, unsigned short);
 	bool loggingReady();
 	void flush();
 

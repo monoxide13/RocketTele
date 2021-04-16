@@ -2,7 +2,7 @@
 
 #include "Logging.hpp"
 #include "SD.h"
-#include "HC12.hpp"
+#include "RH_RF95.h"
 
 #define LOGGING_STATUS_MASK_UNUSED			B11000000
 #define LOGGING_STATUS_MASK_DOWNLINK		B00110000
@@ -18,13 +18,15 @@ namespace {
 	bool ready; // A faster temp way to know if files open.
 	File logFile;
 	#if LOG_DOWNLINK > 0
-	HC12 downlink(&Serial1, HC12_SET_PIN);
+	RH_RF95* downlink;
+	char sendBuffer[64];
 	#endif
 }
 
 void Logging::init(){
 	ready=false;
 	loggingStatus=0;
+	sendBuffer[0]='\0';
 	#if LOG_USB > 0
 	Serial.begin(115200);
 	//while (!Serial.available()){ delay (1);};
@@ -37,14 +39,21 @@ void Logging::init(){
 	#endif
 
 	#if LOG_DOWNLINK > 0
-	downlink.init();
-	if(downlink.testModule()){
+	Serial.println("Starting downlink init");
+	downlink = new RH_RF95(RF95_CS_PIN, RF95_IRQ0_PIN);
+	Serial.println("Downlink opened");
+	if(downlink->init()){
+		Serial.print("-Getting RF95 version -"); // Not sure what this will return.
+		Serial.println((uint8_t)downlink->getDeviceVersion()); // Not sure what this will return.
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
 		#if LOG_USB > 0
 			Serial.println("-Downlink OK");
 		#endif
+		downlink->setTxPower(2); // Valid values 2-20
+		downlink->setModeRx(); // Start listening.
 	}else{
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(2);
+		Serial.println("Downlink init failed!");
 	}
 	#endif
 };
@@ -99,13 +108,18 @@ void Logging::log(unsigned char level, String input){
 	#endif
 	#if LOG_DOWNLINK > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
-		downlink.send(input);
+		input.toCharArray(sendBuffer, 64);
+		if(downlink->send((uint8_t*)sendBuffer, 64)){
+			Serial.println("Message sent");
+		}else{
+			Serial.println("Message not sent");
+		}
 	}
 	#endif
 
 }
 
-void Logging::log(unsigned char level, char* input){
+void Logging::log(unsigned char level, char* input, unsigned short length){
 	#if LOG_USB > 0
 	if( level <= LOG_USB & !(~loggingStatus & LOGGING_STATUS_MASK_USB)){
 		Serial.print(input);
@@ -118,7 +132,7 @@ void Logging::log(unsigned char level, char* input){
 	#endif
 	#if LOG_TELE > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
-		downlink.send(input);
+		downlink->send(input, length);
 	}
 	#endif
 };

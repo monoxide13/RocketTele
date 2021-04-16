@@ -40,7 +40,6 @@
 // D9, AIN 7				// SERCOM0.3 Battery voltage. 2v fully charge.
 #define SD_CS_PIN 4				// SERCOM0+2.0 SD Chip select
 #define SD_CD_PIN 7				// SERCOM3+5.3 SD Card Detect
-#define HC12_SET_PIN 19			// HC12 serial TX/RX command mode pin. A5 on feather
 #define MPU6050_INT_PIN 12		// Accel interrupt
 #define MPU6050_ADDRESS 0x68	// Accel I2C address
 #define MS5611_CS 6				// Barometer chip select
@@ -49,6 +48,10 @@
 #define BUZZER_PIN 18			// Buzzer. A4 on feather
 #define STAGESEPERATION_PIN 17	// Detection of staging. A3 on feather
 #define SYSTEM2_LED_PIN 8		// Second led onboard. No real pin.
+#define RF95_CS_PIN 5
+#define RF95_RST_PIN 19
+#define RF95_IRQ0_PIN 11
+#define RF95_IRQ1_PIN 10
 
 
 /*----- ROCKET STAGES OF FLIGHT -----*/

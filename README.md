@@ -53,18 +53,12 @@ System operation is a 8 step process.
 8. Flight over.
 	
 Telemetry outputs are:
-- C[StageNumber]0
-- S[SensorNumber][SensorStatus]
-- A[zAccelReferenceToRocket][xGyro][yGyro][zGyro]
-- B[baroAlt]
-- G[LAT][LONG][GPSALT]
-- -[Comment]
-
-SD outputs are:
-- C[StageNumber]0
+- C[StageNumber]
 - S[SensorNumber][SensorStatus]
 - H[satelites in use][GPS Accuracy]
 - G[LAT][LONG][GPSALT]
+- B[baroAlt]
+- A[zAccelReferenceToRocket][xGyro][yGyro][zGyro]
 - E[rawXAccel][rawYAccel][rawZAccel][rawXGyro][rawYGyro][rawZGyro]
 - T[rawBaro][Temp][DewPoint]
 - -[Comment]
@@ -75,6 +69,7 @@ Sensors are coded as:
   <li>accelerometer</li>
   <li>GPS</li>
   <li>SD</li>
+  <li>Telemetry</li>
 </ol>
 
 Serial outputs are all not parsable, and all plain comments.
@@ -92,6 +87,7 @@ HC12 library is pieced together from many places, including much of my own work.
 RFM9x library is from [mikem](https://airspayce.com/mikem/arduino/RadioHead/).
 MS5611 library was written by [keionbis](https://github.com/keionbis/ms5611_SPI), with it being reworked by myself.
 UBLOX library was done by [bolderflight](https://github.com/bolderflight/UBLOX).
+LCD_I2C library was taken from [joearmstrong980](https://gitlab.com/joearmstrong980/LCD_I2C) on gitlab.
 I2Cdev, SD, SPI are all Arduino libraries.
 
 Reference Material:

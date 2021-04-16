@@ -32,8 +32,10 @@ void setup(void){
 	pinMode(SD_CS_PIN, OUTPUT);
 	digitalWrite(SD_CS_PIN, HIGH);
 	pinMode(SD_CD_PIN, INPUT_PULLUP);
-	pinMode(HC12_SET_PIN, OUTPUT);
-	digitalWrite(HC12_SET_PIN, HIGH);
+	pinMode(RF95_CS_PIN, OUTPUT);
+	digitalWrite(RF95_CS_PIN, HIGH);
+	pinMode(RF95_RST_PIN, OUTPUT);
+	digitalWrite(RF95_RST_PIN, HIGH);
 	pinMode(MPU6050_INT_PIN, INPUT);
 	pinMode(MS5611_CS, OUTPUT);
 	digitalWrite(MS5611_CS, HIGH);
@@ -49,6 +51,13 @@ void setup(void){
 	/*** Start logging ***/
 	Logging::init();
 	Logging::log(3, "-Adding sensors.\n");
+
+	/* TEMP SECTION */
+	while (1){
+		Logging::log(1, "Test output\n");
+		delay(1000);
+	}
+	/* END TEMP */
 	buzzer.turnOn();
 
 	/*** Add sensor ***/

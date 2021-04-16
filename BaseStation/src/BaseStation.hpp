@@ -4,7 +4,7 @@
 
 #include "Uart.h"
 #include "Output.hpp"
-#include "HC12.hpp"
+#include "Telemetry.hpp"
 
 namespace BaseStation{
 	extern unsigned long loopTime;
@@ -13,6 +13,6 @@ namespace BaseStation{
 	extern Output readyLed;
 	extern Output debugLed;
 	extern Output systemLed;
+	extern Telemetry telemetry;
 	void heartbeat();
 };
-extern HC12 rocket;
