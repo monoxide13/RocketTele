@@ -18,6 +18,10 @@ Output BaseStation::systemLed = Output(SYSTEM2_LED_PIN);
 Telemetry BaseStation::telemetry; 
 LiquidCrystal_I2C lcd(0x20, 16, 2);
 
+namespace {
+	unsigned long long snrUpdate;
+}
+
 void setup(void){
 	/*** Configure pins ***/
 	pinMode(RF95_CS_PIN, OUTPUT);
@@ -53,6 +57,7 @@ void setup(void){
 	lcd.clear();
 	lcd.print("Ready");
 	delay(5000);
+	snrUpdate=micros();
 };
 
 void loop(void){
@@ -61,9 +66,14 @@ void loop(void){
 	if(Serial.available()){
 		Serial.read();
 	}
-	lcd.clear();
-	lcd.print(loopTime);
-	delay(1000);
+	if(snrUpdate<loopTime){
+		lcd.clear();
+		lcd.print(loopTime);
+		lcd.setCursor(0,1);
+		lcd.print(telemetry.getSNR());
+		snrUpdate=loopTime+1000000;
+	}
+	delay(100);
 	heartbeat();
 };
 

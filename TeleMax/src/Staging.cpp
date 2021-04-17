@@ -30,8 +30,7 @@ void Staging::stage_STAGE_PRELAUNCH(){
 		// Clock, stageNum, trigger, calculatedAlt, voltage
 		//Logging::log(1, "clock
 		SensorGroup::getMeasurement();
-		Logging::log(3, "-Loop counter at measurement time: " + String(loopCounter) + "\n");
-		Logging::flush();
+		//Logging::log(3, "-Staging: Loop counter at measurement time: " + String(loopCounter) + "\n");
 		nextMeasurementTime = TeleMax::loopTime + 1000000/LOG_RATE;
 		loopCounter=1;
 	}

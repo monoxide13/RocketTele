@@ -13,13 +13,16 @@
 #define LOGGING_STATUS_OFFSET_SD(x)			x<<2
 #define LOGGING_STATUS_OFFSET_USB(x)		x<<0
 
+#define TX_BUFFER_SIZE 64
+#define TX_POWER 3 // 2-20
+
 namespace {
 	char loggingStatus;
 	bool ready; // A faster temp way to know if files open.
 	File logFile;
 	#if LOG_DOWNLINK > 0
 	RH_RF95* downlink;
-	char sendBuffer[64];
+	char sendBuffer[TX_BUFFER_SIZE];
 	#endif
 }
 
@@ -39,21 +42,24 @@ void Logging::init(){
 	#endif
 
 	#if LOG_DOWNLINK > 0
-	Serial.println("Starting downlink init");
-	downlink = new RH_RF95(RF95_CS_PIN, RF95_IRQ0_PIN);
-	Serial.println("Downlink opened");
+	downlink = new RH_RF95(RF95_CS_PIN, RF95_IRQ0_PIN, hardware_spi);
 	if(downlink->init()){
-		Serial.print("-Getting RF95 version -"); // Not sure what this will return.
-		Serial.println((uint8_t)downlink->getDeviceVersion()); // Not sure what this will return.
-		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
 		#if LOG_USB > 0
-			Serial.println("-Downlink OK");
+		Serial.print("-Getting RF95 version: ");
+		Serial.println((uint8_t)downlink->getDeviceVersion()); // Should return 18
 		#endif
-		downlink->setTxPower(2); // Valid values 2-20
+		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
+		downlink->setTxPower(TX_POWER); // Valid values 2-20
 		downlink->setModeRx(); // Start listening.
+		downlink->setCADTimeout(0);
+		#if LOG_USB > 0
+			Serial.println("-Downlink Started");
+		#endif
 	}else{
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(2);
-		Serial.println("Downlink init failed!");
+		#if LOG_USB > 0
+		Serial.println("-Downlink init failed!");
+		#endif
 	}
 	#endif
 };
@@ -108,12 +114,8 @@ void Logging::log(unsigned char level, String input){
 	#endif
 	#if LOG_DOWNLINK > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
-		input.toCharArray(sendBuffer, 64);
-		if(downlink->send((uint8_t*)sendBuffer, 64)){
-			Serial.println("Message sent");
-		}else{
-			Serial.println("Message not sent");
-		}
+		input.toCharArray(sendBuffer, TX_BUFFER_SIZE);
+		downlink->send((uint8_t*)sendBuffer, TX_BUFFER_SIZE);
 	}
 	#endif
 
@@ -138,7 +140,14 @@ void Logging::log(unsigned char level, char* input, unsigned short length){
 };
 
 void Logging::flush(){
+	#ifdef LOG_USB > 0
+	Serial.flush();
+	#endif
+	#ifdef LOG_SD > 0
 	logFile.flush();
+	#endif
+	#ifdef LOG_TELE > 0
+	#endif
 };
 
 bool Logging::loggingReady(){

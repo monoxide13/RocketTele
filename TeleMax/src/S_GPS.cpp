@@ -19,8 +19,8 @@ S_GPS::~S_GPS(){
 short S_GPS::initialize(){
 	sensorStatus=1;
 	Logging::log(3, "-Emptying GPS buffer");
-	while(gpsPort.available()){
-		gpsPort.read();
+	while(Serial1.available()){
+		Serial1.read();
 		Logging::log(3,".");
 	}
 	Logging::log(3, "\n");

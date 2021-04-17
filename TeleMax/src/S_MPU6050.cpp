@@ -10,12 +10,16 @@ S_MPU6050::S_MPU6050(){
 	sensorStatus=3;
 	TeleMax::dataReady=false;
 	accel->initialize();
-	Logging::log(3, "Testing accel MPU6050 connection... ");
-	Logging::log(3, accel->testConnection() ? ("Connection Successful\n") : ("Connection Failed\n"));
-	Logging::log(3, "Initializing DMP... ");
+	Logging::log(2, "-Testing accel MPU6050 connection... ");
+	if(!accel->testConnection()){
+		Logging::log(1, "-MPU6050 Connection Failed\n");
+		return;
+	}
+	Logging::log(2, "-Connection Successful\n");
+	Logging::log(2, "-Initializing DMP... ");
 	devStatus = accel->dmpInitialize();
 	if(devStatus){
-		Logging::log(3, "DMP Failure: " + String(devStatus) + "\n");
+		Logging::log(2, "-DMP Failure: " + String(devStatus) + "\n");
 		return;
 	}
 	accel->setXGyroOffset(-67);
@@ -25,7 +29,7 @@ S_MPU6050::S_MPU6050(){
 	accel->setYAccelOffset(1147);
 	accel->setZAccelOffset(1534);
 	packetSize = accel->dmpGetFIFOPacketSize();
-	Logging::log(3, "DMP Initialized. Ready for calibration.\n");
+	Logging::log(3, "-DMP Initialized. Ready for calibration.\n");
 	counter=0;
 	sensorStatus=1;
 };
@@ -36,7 +40,7 @@ S_MPU6050::~S_MPU6050(){
 
 short S_MPU6050::initialize(){
 	if(sensorStatus==3){
-		Logging::log(2, "-MPU6050 init error\n");
+		Logging::log(1, "-MPU6050 in error. Unable to initialize.\n");
 		return -1;
 	}
 	Logging::log(3,"-MPU6050 starting calibration.\n");
@@ -55,6 +59,8 @@ short S_MPU6050::initialize(){
 };
 
 void S_MPU6050::tick(){
+	if(sensorStatus!=0)
+		return;
 	if(TeleMax::dataReady){
 		accel->dmpGetCurrentFIFOPacket(fifoBuffer);
 		TeleMax::dataReady=false;
@@ -65,6 +71,8 @@ void S_MPU6050::tick(){
 
 
 double S_MPU6050::getMeasurement(){
+	if(sensorStatus!=0)
+		return 0;
 // Output quarternion and real world accel (acceleration in reference to observer)
 	accel->dmpGetQuaternion(&q, fifoBuffer);
 	accel->dmpGetAccel(&aa, fifoBuffer);

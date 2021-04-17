@@ -14,11 +14,9 @@
 using namespace TeleMax;
 using namespace Staging;
 
-Uart gpsPort(&sercom1, 10, 11, SercomRXPad::SERCOM_RX_PAD_0, SercomUartTXPad::UART_TX_PAD_2);
-
 bool TeleMax::heartbeat_toggle=false;
 unsigned long TeleMax::loopTime=0;
-UBLOX gps(gpsPort);
+UBLOX gps(Serial1);
 Output TeleMax::debugLed = Output(SYSTEM_LED_PIN);
 Output TeleMax::systemLed = Output(SYSTEM2_LED_PIN);
 Output TeleMax::buzzer = Output(BUZZER_PIN, true);
@@ -36,6 +34,8 @@ void setup(void){
 	digitalWrite(RF95_CS_PIN, HIGH);
 	pinMode(RF95_RST_PIN, OUTPUT);
 	digitalWrite(RF95_RST_PIN, HIGH);
+	pinMode(RF95_IRQ0_PIN, INPUT);
+	pinMode(RF95_IRQ1_PIN, INPUT);
 	pinMode(MPU6050_INT_PIN, INPUT);
 	pinMode(MS5611_CS, OUTPUT);
 	digitalWrite(MS5611_CS, HIGH);
@@ -47,17 +47,12 @@ void setup(void){
 	/*** Start the bus ***/
 	Wire.begin();
 	SPI.begin();
+	Serial1.begin(9600); // GPS
 
 	/*** Start logging ***/
 	Logging::init();
 	Logging::log(3, "-Adding sensors.\n");
 
-	/* TEMP SECTION */
-	while (1){
-		Logging::log(1, "Test output\n");
-		delay(1000);
-	}
-	/* END TEMP */
 	buzzer.turnOn();
 
 	/*** Add sensor ***/
@@ -66,9 +61,6 @@ void setup(void){
 	SensorGroup::addSensor(new S_MPU6050());
 	SensorGroup::addSensor(new S_MS5611());
 	SensorGroup::addSensor(new S_GPS());
-	gpsPort.begin(19200);
-	pinPeripheral(10, PIO_SERCOM); // TX
-	pinPeripheral(11, PIO_SERCOM); // RX
 	
 	/*** Set initial values ***/
 	Logging::log(3, "-Setting initial values.\n");
@@ -123,15 +115,19 @@ void loop(void){
 				break;
 		}
 		Logging::log(3, "-Stage changed: " + String(stage) + "\n");
-		stageChange=false;
-		loopCounter=0;
+		stageChange = false;
+		loopCounter = 0;
 	}
 	if(voltageReadTime<TeleMax::loopTime){
 		Logging::log(1, "C:" + String(TeleMax::loopTime) + "," + String(stage) + ",0,0," + String(analogRead(VOLTAGE_PIN)*6.6/1024) + "\n");
-		voltageReadTime=TeleMax::loopTime+10000000; // Every 10 seconds.
+		voltageReadTime = TeleMax::loopTime+10000000; // Every 10 seconds.
 	}
 	heartbeat();
 	stagePtr();
+	#if LOG_USB>0
+	if(Serial.available()>0)
+		Serial.read();
+	#endif
 };
 
 inline void TeleMax::heartbeat(){
@@ -139,9 +135,5 @@ inline void TeleMax::heartbeat(){
 	debugLed.tick();
 	buzzer.tick();
 	systemLed.tick();
-};
-
-void SERCOM1_Handler(){
-	gpsPort.IrqHandler();
 };
 

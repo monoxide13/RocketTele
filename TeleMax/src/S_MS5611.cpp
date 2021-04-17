@@ -7,7 +7,7 @@
 
 
 S_MS5611::S_MS5611(){
-	Logging::log(3, "-MS5611 in startup.\n");
+	Logging::log(2, "-MS5611 in startup.\n");
 	baro=new MS5611(MS5611_CS);
 	sensorStatus=3;
 	tempReadInProgress=false;
@@ -23,10 +23,10 @@ S_MS5611::S_MS5611(){
 	// For me, if sensor is not connected init will return 0.
 	if(baro->init()){
 		sensorStatus=1; // Sensor good, in start up.
+		Logging::log(2, "-MS5611 Startup complete.\n");
 	}else{
 		Logging::log(1, "-MS5611 unable to startup.\n");
 	}
-	Logging::log(3, "-MS5611 Startup complete.\n");
 };
 
 S_MS5611::~S_MS5611(){
@@ -35,7 +35,7 @@ S_MS5611::~S_MS5611(){
 
 short S_MS5611::initialize(){
 	if(sensorStatus==3){
-		Logging::log(2, "-MS5611 error. Unable to initialize.\n");
+		Logging::log(1, "-MS5611 in error. Unable to initialize.\n");
 		return -1;
 	}
 	Logging::log(3, "-MS5611 starting calibration.\n");
@@ -69,6 +69,8 @@ short S_MS5611::initialize(){
 };
 
 void S_MS5611::tick(){
+	if(sensorStatus!=0)
+		return;
 	if(readingInProgress){
 		++readingLoops;
 		if(Staging::nextMeasurementTime<1000 + TeleMax::loopTime){
@@ -99,6 +101,8 @@ void S_MS5611::tick(){
 };
 
 double S_MS5611::getMeasurement(){
+	if(sensorStatus!=0)
+		return 0;
 	readingReady=false;
 	Logging::log(3, "-MS5611: readingLoops:" + String(readingLoops) + " readyLoops:" + String(readyLoops) + "\n");
 	// I'm logging the first order temp compensation. The second could be used for more accuracy, but I'm wanting to save a few cpu cycles.
