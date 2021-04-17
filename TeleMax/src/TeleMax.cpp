@@ -7,7 +7,7 @@
 #include "Staging.hpp"
 #include "S_MPU6050.hpp"
 #include "S_MS5611.hpp"
-#include "S_GPS.hpp"
+#include "S_GPS_NMEA.hpp"
 #include "wiring_private.h" // for pinPeripheral();
 
 
@@ -16,7 +16,8 @@ using namespace Staging;
 
 bool TeleMax::heartbeat_toggle=false;
 unsigned long TeleMax::loopTime=0;
-UBLOX gps(Serial1);
+//UBLOX gps(Serial1);
+Adafruit_GPS gps(&Serial1);
 Output TeleMax::debugLed = Output(SYSTEM_LED_PIN);
 Output TeleMax::systemLed = Output(SYSTEM2_LED_PIN);
 Output TeleMax::buzzer = Output(BUZZER_PIN, true);
@@ -47,7 +48,6 @@ void setup(void){
 	/*** Start the bus ***/
 	Wire.begin();
 	SPI.begin();
-	Serial1.begin(9600); // GPS
 
 	/*** Start logging ***/
 	Logging::init();
@@ -58,9 +58,10 @@ void setup(void){
 	/*** Add sensor ***/
 	SensorGroup::sensors = NULL;
 	SensorGroup::sensorCount = 0;
-	SensorGroup::addSensor(new S_MPU6050());
-	SensorGroup::addSensor(new S_MS5611());
-	SensorGroup::addSensor(new S_GPS());
+	//SensorGroup::addSensor(new S_MPU6050());
+	//SensorGroup::addSensor(new S_MS5611());
+	//SensorGroup::addSensor(new S_GPS());
+	SensorGroup::addSensor(new S_GPS_NMEA());
 	
 	/*** Set initial values ***/
 	Logging::log(3, "-Setting initial values.\n");

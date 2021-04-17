@@ -77,6 +77,7 @@ DEFINES := -DF_CPU=$(BOARD_BUILD_FCPU) -DARDUINO=10605 -DARDUINO_$(BOARD_BOARD) 
 # Add something that searches for all folders inside LDIR folder.
 INCLUDE_DIRS := $(LDIR) \
     $(LDIR)/UBLOX/src \
+	$(LDIR)/Adafruit_GPS/src \
     $(LDIR)/SD/src \
 	$(wildcard $(LDIR)/*) \
 	$(GDIR)/CMSIS_5/CMSIS/Core/Include \
@@ -133,7 +134,7 @@ target: $(TARGET).bin
 upload: target
 	stty -F /dev/$(DEVICE) 1200
 	sleep 4
-	stty -F /dev/$(DEVICE) hupcl # I don't need this line, but have read some do.
+	stty -F /dev/$(DEVICE) hupcl # I don't need this line, but have read some do
 	sleep 1
 	$(UPLOADER) -i -d --port=$(DEVICE) -U true -i -e -w -v $(OUTPUT)/$(TARGET).bin -R
 

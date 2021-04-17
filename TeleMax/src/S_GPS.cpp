@@ -29,6 +29,7 @@ short S_GPS::initialize(){
 
 void S_GPS::tick(){
 	// GPS is set to transmit every .5 seconds. Therefore new data is pretty rare comparitively. So when we get data, lets write it out immediately.
+	/* Commented out since using NMEA
 	if(gps.readSensor()){
 		newData=true;
 		Logging::log(2,"-GNSS: DT: " + String(gps.getMonth(),2) + "/" + String(gps.getDay(),2) + "/" + String(gps.getYear()) + "-" + String(gps.getHour(),2) + ":" + String(gps.getMin(),2) + ":" + String(gps.getSec(),2));
@@ -39,6 +40,7 @@ void S_GPS::tick(){
 		else
 			sensorStatus=3;
 	};
+	*/
 };
 
 double S_GPS::getMeasurement(){

@@ -6,6 +6,7 @@
 #include "time.h"
 #include "Uart.h"
 #include "UBLOX.h"
+#include "Adafruit_GPS.h"
 #include "Output.hpp"
 
 namespace TeleMax{
@@ -19,4 +20,5 @@ namespace TeleMax{
 	extern float voltage;
 };
 extern Uart gpsPort;
-extern UBLOX gps;
+//extern UBLOX gps;
+extern Adafruit_GPS gps;
