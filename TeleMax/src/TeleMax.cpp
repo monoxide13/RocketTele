@@ -58,10 +58,10 @@ void setup(void){
 	/*** Add sensor ***/
 	SensorGroup::sensors = NULL;
 	SensorGroup::sensorCount = 0;
-	//SensorGroup::addSensor(new S_MPU6050());
-	//SensorGroup::addSensor(new S_MS5611());
-	//SensorGroup::addSensor(new S_GPS());
-	SensorGroup::addSensor(new S_GPS_NMEA());
+	SensorGroup::addSensor(new S_MPU6050());
+	SensorGroup::addSensor(new S_MS5611());
+	//SensorGroup::addSensor(new S_GPS()); // Old UBLOX gps
+	SensorGroup::addSensor(new S_GPS_NMEA()); // NMEA
 	
 	/*** Set initial values ***/
 	Logging::log(3, "-Setting initial values.\n");

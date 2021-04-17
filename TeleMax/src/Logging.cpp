@@ -14,7 +14,7 @@
 #define LOGGING_STATUS_OFFSET_USB(x)		x<<0
 
 #define TX_BUFFER_SIZE 64
-#define TX_POWER 3 // 2-20
+#define TX_POWER 5 // 2-20
 
 namespace {
 	char loggingStatus;
@@ -29,7 +29,6 @@ namespace {
 void Logging::init(){
 	ready=false;
 	loggingStatus=0;
-	sendBuffer[0]='\0';
 	#if LOG_USB > 0
 	Serial.begin(115200);
 	//while (!Serial.available()){ delay (1);};
@@ -49,6 +48,7 @@ void Logging::init(){
 		Serial.println((uint8_t)downlink->getDeviceVersion()); // Should return 18
 		#endif
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
+		downlink->setModemConfig(RH_RF95::Bw500Cr45Sf128);
 		downlink->setTxPower(TX_POWER); // Valid values 2-20
 		downlink->setModeRx(); // Start listening.
 		downlink->setCADTimeout(0);
