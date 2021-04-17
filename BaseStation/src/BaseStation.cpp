@@ -35,7 +35,7 @@ void setup(void){
 	SPI.begin();
 
 	/*** Start the serial ports ***/
-	Serial.begin(9600);
+	Serial.begin(192000);
 	while(!Serial.available()){};
 	Serial.println("+Starting...");
 	pinPeripheral(10, PIO_SERCOM); // TX
@@ -73,7 +73,6 @@ void loop(void){
 		lcd.print(telemetry.getSNR());
 		snrUpdate=loopTime+1000000;
 	}
-	delay(100);
 	heartbeat();
 };
 

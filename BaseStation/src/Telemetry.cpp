@@ -23,6 +23,7 @@ int Telemetry::init(){
 	}
 	Serial.print("+BaseStation downlink version:");
 	Serial.println((uint8_t)downlink->getDeviceVersion());
+    downlink->setModemConfig(RH_RF95::Bw500Cr45Sf128);
 	downlink->setTxPower(2);
 	downlink->setModeRx();
 	return 0;
@@ -30,8 +31,9 @@ int Telemetry::init(){
 
 bool Telemetry::receive(){
 	rxLength = RX_BUFFER_LENGTH;
-	downlink->recv((uint8_t*)rxBuffer, (uint8_t*)&rxLength);
-	Serial.write(rxBuffer, rxLength);
+	if(downlink->recv((uint8_t*)rxBuffer, (uint8_t*)&rxLength)){
+    	Serial.write(rxBuffer, rxLength);
+    }
 	snrArray[snrIter]=downlink->lastSNR();
 	if(++snrIter>=SNR_HYSTERESIS)
 		snrIter=0;
