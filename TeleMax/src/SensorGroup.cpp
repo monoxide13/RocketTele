@@ -62,7 +62,7 @@ bool SensorGroup::isReady(){
 			ready=false;
 		current = current->next;
 	}
-	return true;
+	return ready;
 };
 
 unsigned short SensorGroup::getSensorStatus(){
@@ -73,5 +73,5 @@ unsigned short SensorGroup::getSensorStatus(){
 		retval |= current->sensor->getSensorStatus();
 		current = current->next;
 	}
-	return true;
+	return retval;
 };
