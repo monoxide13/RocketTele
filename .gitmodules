@@ -19,3 +19,6 @@
 [submodule "libraries/HC12"]
 	path = libraries/HC12
 	url = https://github.com/monoxide13/HC12.git
+[submodule "libraries/Adafruit_GPS"]
+	path = libraries/Adafruit_GPS
+	url = https://github.com/adafruit/Adafruit_GPS/
