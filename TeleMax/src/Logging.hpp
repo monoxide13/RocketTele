@@ -5,6 +5,7 @@
 
 #include "global.hpp"
 #include "Stream.h"
+#include "packet_def.h"
 
 namespace Logging{
 	void init();
@@ -14,6 +15,8 @@ namespace Logging{
 	void log(unsigned char, char*, unsigned short);
 	bool loggingReady();
 	void flush();
+
+	extern union Telemetry_Packet * telemetryData;
 
 	// Private: Defined in Logging.cpp
 		/*	char loggingStatus

@@ -12,17 +12,17 @@
 
 
 using namespace TeleMax;
-using namespace Staging;
 
-bool TeleMax::heartbeat_toggle=false;
-unsigned long TeleMax::loopTime=0;
+bool TeleMax::heartbeat_toggle = false;
+unsigned long TeleMax::loopTime = 0;
 //UBLOX gps(Serial1);
 Adafruit_GPS gps(&Serial1);
 Output TeleMax::debugLed = Output(SYSTEM_LED_PIN);
 Output TeleMax::systemLed = Output(SYSTEM2_LED_PIN);
 Output TeleMax::buzzer = Output(BUZZER_PIN, true);
-unsigned long TeleMax::voltageReadTime=0;
-float TeleMax::voltage=0;
+unsigned long TeleMax::voltageReadTime = 0;
+float TeleMax::voltage = 0;
+unsigned long TeleMax::loopCounter = 0;
 
 
 void setup(void){
@@ -65,9 +65,6 @@ void setup(void){
 	
 	/*** Set initial values ***/
 	Logging::log(3, "-Setting initial values.\n");
-	stage=STAGE_INIT;
-	stageChange=true;
-	loopCounter=0;
 	Staging::nextMeasurementTime=0;
 	voltageReadTime=0;
 	Logging::log(3, "-Init delay(sec): ");
@@ -89,46 +86,23 @@ void setup(void){
 };
 
 void loop(void){
-	++loopCounter;
+	// Update execution timer
 	loopTime = micros();
-	if(stageChange){
-		switch(stage){
-			case STAGE_PRELAUNCH:
-				stagePtr = &stage_STAGE_PRELAUNCH;
-				break;
-			case STAGE_THRUST:
-				stagePtr = &stage_STAGE_THRUST;
-				break;
-			case STAGE_COAST:
-				stagePtr = &stage_STAGE_COAST;
-				break;
-			case STAGE_APOGEE:
-				stagePtr = &stage_STAGE_APOGEE;
-				break;
-			case STAGE_DESCENT:
-				stagePtr = &stage_STAGE_DESCENT;
-				break;
-			case STAGE_RECOVERY:
-				stagePtr = &stage_STAGE_RECOVERY;
-				break;
-			default:
-				stagePtr = &stage_STAGE_INIT;
-				break;
-		}
-		Logging::log(3, "-Stage changed: " + String(stage) + "\n");
-		stageChange = false;
-		loopCounter = 0;
-	}
-	if(voltageReadTime<TeleMax::loopTime){
-		Logging::log(1, "C:" + String(TeleMax::loopTime) + "," + String(stage) + ",0,0," + String(analogRead(VOLTAGE_PIN)*6.6/1024) + "\n");
-		voltageReadTime = TeleMax::loopTime+10000000; // Every 10 seconds.
-	}
+	++loopCounter;
+	// Execute staging and sensor commands
+	Staging::staging();
+	// Update outputs
 	heartbeat();
-	stagePtr();
+	// Check for inputs
 	#if LOG_USB>0
 	if(Serial.available()>0)
 		Serial.read();
 	#endif
+	// Misc.
+	if(voltageReadTime<TeleMax::loopTime){
+		Logging::log(1, "C:" + String(TeleMax::loopTime) + "," + String(Staging::stage) + ",0,0," + String(analogRead(VOLTAGE_PIN)*6.6/1024) + "\n");
+		voltageReadTime = TeleMax::loopTime+10000000; // Every 10 seconds.
+	}
 };
 
 inline void TeleMax::heartbeat(){

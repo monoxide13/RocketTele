@@ -26,7 +26,10 @@ namespace {
 	#endif
 }
 
+union Telemetry_Packet * Logging::telemetryData = new union Telemetry_Packet;
+
 void Logging::init(){
+	Telemetry_Packet_Init(Logging::telemetryData);
 	ready=false;
 	loggingStatus=0;
 	#if LOG_USB > 0
