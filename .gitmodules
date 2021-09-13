@@ -6,7 +6,7 @@
 	url = https://github.com/arduino-libraries/SD.git
 [submodule "libraries/UBLOX"]
 	path = libraries/UBLOX
-	url = https://github.com/monoxide13/UBLOX
+	url = ssh://git@github.com/monoxide13/UBLOX
 [submodule "libraries/ArduinoCore-samd"]
 	path = libraries/ArduinoCore-samd
 	url = https://github.com/adafruit/ArduinoCore-samd.git
@@ -18,7 +18,10 @@
 	url = https://github.com/ARM-software/CMSIS_5.git
 [submodule "libraries/HC12"]
 	path = libraries/HC12
-	url = https://github.com/monoxide13/HC12.git
+	url = ssh://git@github.com/monoxide13/HC12.git
 [submodule "libraries/Adafruit_GPS"]
 	path = libraries/Adafruit_GPS
 	url = https://github.com/adafruit/Adafruit_GPS/
+[submodule "libraries/BMP388_DEV"]
+	path = libraries/BMP388_DEV
+	url = ssh://git@github.com/monoxide13/BMP388_DEV.git
