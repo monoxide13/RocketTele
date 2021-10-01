@@ -6,10 +6,10 @@
 #include "TeleMax.hpp"
 
 
-S_MS5611::S_MS5611(){
+S_MS5611::S_MS5611() : Sensor(STATUS_OFFSET){
 	Logging::log(2, "-MS5611 in startup.\n");
 	baro=new MS5611(MS5611_CS);
-	sensorStatus=3;
+	sensorStatus=0;
 	tempReadInProgress=false;
 	tempReadTime=0;
 	readingInProgress=false;
@@ -19,12 +19,13 @@ S_MS5611::S_MS5611(){
 	pres=0;
 	readingLoops=0;
 	readyLoops=0;
-	baro->init();
 	// For me, if sensor is not connected init will return 0.
+	baro->init();
 	if(baro->init()){
-		sensorStatus=1; // Sensor good, in start up.
+		sensorStatus=2; // Sensor good, in start up.
 		Logging::log(2, "-MS5611 Startup complete.\n");
 	}else{
+		sensorStatus=1; // Sensor no good.
 		Logging::log(1, "-MS5611 unable to startup.\n");
 	}
 };
@@ -34,7 +35,7 @@ S_MS5611::~S_MS5611(){
 };
 
 short S_MS5611::initialize(){
-	if(sensorStatus==3){
+	if(sensorStatus==1){
 		Logging::log(1, "-MS5611 in error. Unable to initialize.\n");
 		return -1;
 	}
@@ -45,10 +46,13 @@ short S_MS5611::initialize(){
 	for(x=0; x<10; ++x){
 		baro->getTemperature(CMD_ADC_4096);
 		delay(100);
-		temp += baro->getReading();
+//		temp += baro->getReading();
+		int x = baro->getReading();
+		Serial.println(x);
+		temp +=x;
 		delay(100);
 	}
-	temp = (unsigned long)temp/10;
+	temp = (unsigned long)round(temp/10);
 	Logging::log(2, "-MS5611 reporting temperature: " + String(baro->calculateSecondOrderTemperatureCompensation(temp)) + "c\n");
 
 	// Take 5 pressure readings, and average
@@ -59,17 +63,17 @@ short S_MS5611::initialize(){
 		pres += baro->getReading();
 		delay(100);
 	}
-	pres=(unsigned long) pres/10;
+	pres=(unsigned long) round(pres/10);
 	Logging::log(2, "-MS5611 station pressure:" + \
 		String(baro->setStationPressure(baro->calculatePressureCompensation(pres, temp))) + \
 		"mbar\n");
 	tempReadTime = TeleMax::loopTime+20000;
-	sensorStatus=0;
+	sensorStatus=3;
 	return 0;
 };
 
 void S_MS5611::tick(){
-	if(sensorStatus!=0)
+	if(sensorStatus!=3)
 		return;
 	if(readingInProgress){
 		++readingLoops;
@@ -101,12 +105,13 @@ void S_MS5611::tick(){
 };
 
 double S_MS5611::getMeasurement(){
-	if(sensorStatus!=0)
+	if(sensorStatus!=3)
 		return 0;
 	readingReady=false;
 	Logging::log(3, "-MS5611: readingLoops:" + String(readingLoops) + " readyLoops:" + String(readyLoops) + "\n");
 	// I'm logging the first order temp compensation. The second could be used for more accuracy, but I'm wanting to save a few cpu cycles.
-	Logging::log(1, "B:" + String(baro->getAltitude(pres, temp)) + "," + String(baro->calculateTemperatureCompensation(temp)) + "," + String(baro->calculatePressureCompensation(pres, temp)) +  "\n");
+	telemetryPacket.data.balt = (float)baro->getAltitude(pres, temp);
+	Logging::log(1, "B:" + String(telemetryPacket.data.balt) + "," + String(baro->calculateTemperatureCompensation(temp)) + "," + String(baro->calculatePressureCompensation(pres, temp)) +  "\n");
 	readingLoops=0;
 	readyLoops=0;
 	return 0;

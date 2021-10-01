@@ -6,6 +6,8 @@
 #include "ms5611.h"
 #include "global.hpp"
 
+#define STATUS_OFFSET 4
+
 class S_MS5611 : public virtual Sensor{
 	public:
 	S_MS5611();
@@ -20,6 +22,7 @@ class S_MS5611 : public virtual Sensor{
 	bool readingInProgress;
 	bool readingReady;
 	char cmd;
+	float altitude;
 	unsigned long temp;
 	unsigned long pres;
 	unsigned long readingLoops;
