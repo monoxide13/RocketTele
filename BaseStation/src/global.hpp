@@ -30,8 +30,8 @@
 /*----- ROCKET STAGES OF FLIGHT -----*/
 #define STAGE_INIT 0
 #define STAGE_PRELAUNCH 1
-#define STAGE_THRUST 2
-#define STAGE_COAST 3
+#define STAGE_ARMED 2
+#define STAGE_ASCENT 3
 #define STAGE_APOGEE 4
 #define STAGE_DESCENT 5
 #define STAGE_RECOVERY 6

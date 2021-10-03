@@ -56,7 +56,7 @@ void setup(void){
 	}
 	lcd.clear();
 	lcd.print("Ready");
-	delay(5000);
+	delay(2000);
 	snrUpdate=micros();
 };
 

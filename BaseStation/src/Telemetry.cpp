@@ -31,8 +31,8 @@ int Telemetry::init(){
 
 bool Telemetry::receive(){
 	rxLength = RX_BUFFER_LENGTH;
-	if(downlink->recv((uint8_t*)rxBuffer, (uint8_t*)&rxLength)){
-    	Serial.write(rxBuffer, rxLength);
+	if(downlink->recv((uint8_t*)rxBuffer, &rxLength)){
+    	Serial.write((uint8_t*)rxBuffer, rxLength);
     }
 	snrArray[snrIter]=downlink->lastSNR();
 	if(++snrIter>=SNR_HYSTERESIS)

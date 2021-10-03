@@ -16,10 +16,9 @@ class Telemetry{
 	int getSNR();
 	private:
 	RH_RF95 * downlink;
-	char rxBuffer[RX_BUFFER_LENGTH];
-	char oldrxBuffer[RX_BUFFER_LENGTH];
+    uint8_t * rxBuffer[RX_BUFFER_LENGTH];
     unsigned short rxPosition;
-	unsigned short rxLength;
+	unsigned char rxLength;
 	int snrArray[SNR_HYSTERESIS];
 	unsigned short snrIter;
 };
