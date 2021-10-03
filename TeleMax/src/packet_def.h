@@ -23,7 +23,7 @@ struct Telemetry_Packet_Struct{
 		// 16 byte boundary
 	float lon;
 	float galt;
-	float pdop;
+	float hdop;
 
 	/* Accel   4*7=28 bytes */
 	float qw; // QuaternionA
