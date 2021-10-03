@@ -18,7 +18,6 @@ namespace TeleMax{
 	extern Output buzzer;
 	extern unsigned long voltageReadTime;
 	extern float voltage;
-	extern unsigned long loopCounter;
 };
 extern Uart gpsPort;
 //extern UBLOX gps;
