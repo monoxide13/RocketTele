@@ -16,13 +16,13 @@
 * 3 - Maximum. Use only for debugging.
 */
 // Output telemetry over downlink port
-#define LOG_DOWNLINK 1
+#define LOG_DOWNLINK 0
 // Output telemetry to SD card
 #define LOG_SD 0
 // Prefix filename for SD recording. 6 char max.
 #define FILENAME_PREFIX LAUNCH
 // Output telemetry to onboard USB serial port
-#define LOG_USB 2
+#define LOG_USB 1
 // Logging rate, in Hz.
 #define LOG_RATE 10
 
@@ -39,12 +39,13 @@
 // RXD							// SERCOM5.3
 // GPS RX 11					// SERCOM1+3.0
 // GPS TX 10					// SERCOM1+3.2
-// D9, AIN 7				// SERCOM0.3 Battery voltage. 2v fully charge.
+// D9, AIN 7					// SERCOM0.3 Battery voltage. 2v fully charge.
 #define SD_CS_PIN 4				// SERCOM0+2.0 SD Chip select
 #define SD_CD_PIN 7				// SERCOM3+5.3 SD Card Detect
 #define MPU6050_INT_PIN 12		// Accel interrupt
 #define MPU6050_ADDRESS 0x68	// Accel I2C address
-#define MS5611_CS 6				// Barometer chip select
+#define BMP388_CS_PIN 6			// Barometer chip select
+#define BMP388_INT_PIN A4		// Barometer interrupt
 #define VOLTAGE_PIN	A7			// Battery voltage. 2v fully charged. aR()*6.6/1024 
 #define SYSTEM_LED_PIN 13		// Also onboard LED
 #define BUZZER_PIN 18			// Buzzer. A4 on feather
