@@ -14,7 +14,7 @@
 #define LOGGING_STATUS_OFFSET_USB(x)		x<<0
 
 #define TX_BUFFER_SIZE 64
-#define TX_POWER 5 // 2-20
+#define TX_POWER 3 // 2-20
 
 namespace {
 	char loggingStatus;
@@ -56,12 +56,12 @@ void Logging::init(){
 		downlink->setModeRx(); // Start listening.
 		downlink->setCADTimeout(0);
 		#if LOG_USB > 0
-			Serial.println("-Downlink Started");
+		Logging::log(2, "-Downlink Started.\n");
 		#endif
 	}else{
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(2);
 		#if LOG_USB > 0
-		Serial.println("-Downlink init failed!");
+		Logging::log(2, "-Downlink init failed!\n");
 		#endif
 	}
 	#endif
