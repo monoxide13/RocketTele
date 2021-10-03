@@ -4,6 +4,7 @@
 #include "Logging.hpp"
 #include "Staging.hpp"
 #include "TeleMax.hpp"
+#define STATUS_OFFSET 4
 
 
 S_BMP388::S_BMP388() {
@@ -15,7 +16,7 @@ S_BMP388::S_BMP388() {
 	// If sensor is not connected or wrong ID, begin() returns 0. Success=1.
 	if(baro->begin(SLEEP_MODE)){ //Set mode to forced/one shot. 0x01
 		sensorStatus=2; // Sensor good, in start up.
-		Logging::log(2, "-BMP388 Startup complete.\n");
+		Logging::log(1, "-BMP388 Startup complete.\n");
 	}else{
 		sensorStatus=1; // Sensor no good.
 		Logging::log(1, "-BMP388 unable to startup.\n");
@@ -76,9 +77,9 @@ void S_BMP388::tick(){
 		++counter;
 		// TODO: Read measurement.
 		if(!(baro->getMeasurements(temp, pres, altitude))){
-			Logging::log(2, "-BMP388. Reading ready but unable to read");
+			Logging::log(3, "-BMP388. Reading ready but unable to read");
 		}
-		Logging::log(1, "B:" + String(altitude) + ',' + String(temp) + ',' + String(pres) + '\n');
+		Logging::log(2, "B:" + String(altitude) + ',' + String(temp) + ',' + String(pres) + '\n');
 		S_BMP388_int::dataReady=false;
 	}
 
@@ -89,9 +90,14 @@ double S_BMP388::getMeasurement(){
 		return 0;
 	Logging::log(3, "-B: measurements taken: " + String(counter) + '\n');
 	Logging::telemetryData->data.balt = altitude;
+	Logging::telemetryData->data.temp = temp;;
 	counter=0;
 	return 0;
 };
+
+unsigned char S_BMP388::getStatus(){
+	return sensorStatus << STATUS_OFFSET;
+}
 
 volatile bool S_BMP388_int::dataReady;
 void S_BMP388_int::callback(){

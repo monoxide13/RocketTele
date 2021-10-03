@@ -15,6 +15,7 @@ class S_BMP388 : public virtual Sensor{
 	short initialize() override;
 	void tick() override;
 	double getMeasurement() override;
+	unsigned char getStatus() override;
 	private:
 	BMP388_DEV* baro;
 	float altitude;
