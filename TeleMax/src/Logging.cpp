@@ -77,10 +77,10 @@ void Logging::openFile(){
 	loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_SD | LOGGING_STATUS_OFFSET_SD(1); 
 	Logging::log(2, "-SD Card present\n");
 	if(SD.begin(SD_CS_PIN)){
-		Logging::log(1, "-SD Card opened.\n");
+		Logging::log(2, "-SD Card opened.\n");
 	}else{
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_SD | LOGGING_STATUS_OFFSET_SD(2);
-		Logging::log(1, "-SD Card unable to be opened\n");
+		Logging::log(2, "-SD Card unable to be opened\n");
 		return;
 	}
 	unsigned short trialCount=0;
@@ -127,17 +127,17 @@ void Logging::log(unsigned char level, String input){
 void Logging::log(unsigned char level, char* input, unsigned short length){
 	#if LOG_USB > 0
 	if( level <= LOG_USB & !(~loggingStatus & LOGGING_STATUS_MASK_USB)){
-		Serial.print(input);
+		Serial.write(input, length);
 	}
 	#endif
 	#if LOG_SD > 0
 	if( level <= LOG_SD & !(~loggingStatus & LOGGING_STATUS_MASK_SD)){
-		logFile.print(input);
+		logFile.write(input, length);
 	}
 	#endif
-	#if LOG_TELE > 0
+	#if LOG_DOWNLINK > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
-		downlink->send(input, length);
+		downlink->send((unsigned char *)input, length);
 	}
 	#endif
 };
@@ -149,7 +149,7 @@ void Logging::flush(){
 	#ifdef LOG_SD > 0
 	logFile.flush();
 	#endif
-	#ifdef LOG_TELE > 0
+	#ifdef LOG_DOWNLINK > 0
 	#endif
 };
 
