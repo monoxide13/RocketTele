@@ -5,13 +5,15 @@
 #include "Staging.hpp"
 #include "TeleMax.hpp"
 
+#define STATUS_OFFSET 0
+
 S_GPS_NMEA::S_GPS_NMEA(){
 	newData=false;
-	sensorStatus=3;
 	sensorStatus=1;
 	gps.begin(9600);
 	Logging::log(3, "-GPS Added\n");
 	gps.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
+	hasReceivedNMEA=false;
 };
 
 S_GPS_NMEA::~S_GPS_NMEA(){
@@ -34,6 +36,7 @@ short S_GPS_NMEA::initialize(){
 	delay(1000);
 	//gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
 	gps.sendCommand(PMTK_SET_NMEA_UPDATE_2HZ);
+	sensorStatus=2;
 	return 0;
 };
 
@@ -41,11 +44,12 @@ void S_GPS_NMEA::tick(){
 	gps.read();
 	if(gps.newNMEAreceived()){
 		Logging::log(3, "-NMEA " + String(gps.lastNMEA()) + "\n");
+		sensorStatus=0;
 		if(gps.parse(gps.lastNMEA())){
 			newData=true;
-			Logging::log(1, "-GPS Fix:" + String(gps.fix)+", Quality:" + String(gps.fixquality) + ", Sats:" + String(gps.satellites) + "\n");
+			Logging::log(1, "-GPS Fix:" + String(gps.fix)+", Quality:" + String(gps.fixquality) + ", Sats:" + String(gps.satellites) + ", HDOP:" + String(gps.HDOP) + "\n");
 			if(gps.fix){
-				Logging::log(1, "-GPS Lat:" + String(gps.latitude) + String(gps.lat) + ", Lon:" + String(gps.longitude) + String(gps.lon) + ", Alt:" + String(gps.altitude) + "\n");
+				Logging::log(2, "-GPS Lat:" + String(gps.latitude) + String(gps.lat) + ", Lon:" + String(gps.longitude) + String(gps.lon) + ", Alt:" + String(gps.altitude) + "\n");
 			}
 			switch(gps.fixquality){
 				case 2:
@@ -66,5 +70,15 @@ double S_GPS_NMEA::getMeasurement(){
 	if(newData){
 		newData=false;
 	}
+	Logging::telemetryData->data.fixqual = 0;
+	Logging::telemetryData->data.fixqual = gps.fixquality << 6 | gps.satellites;
+	Logging::telemetryData->data.lat = gps.latitude;
+	Logging::telemetryData->data.lon = gps.longitude;
+	Logging::telemetryData->data.galt = gps.altitude;
+	Logging::telemetryData->data.hdop = gps.HDOP;
 	return 0;
 };
+
+unsigned char S_GPS_NMEA::getStatus(){
+	return sensorStatus << STATUS_OFFSET;
+}

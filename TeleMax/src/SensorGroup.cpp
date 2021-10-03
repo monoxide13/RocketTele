@@ -58,19 +58,18 @@ bool SensorGroup::isReady(){
 	bool ready=true;
 	struct Sensor_Linked_List* current = sensors;
 	while(current!=NULL){
-		if(current->sensor->getSensorStatus())
+		if(current->sensor->getStatus())
 			ready=false;
 		current = current->next;
 	}
 	return ready;
 };
 
-unsigned short SensorGroup::getSensorStatus(){
+unsigned short SensorGroup::getStatus(){
 	unsigned short retval=0;
 	struct Sensor_Linked_List* current = sensors;
 	while(current!=NULL){
-		retval = retval << 2;
-		retval |= current->sensor->getSensorStatus();
+		retval |= current->sensor->getStatus();
 		current = current->next;
 	}
 	return retval;

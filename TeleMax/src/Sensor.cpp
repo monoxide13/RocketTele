@@ -14,6 +14,6 @@ double Sensor::getMeasurement(){
 	return 0;
 };
 
-unsigned char Sensor::getSensorStatus(){
+unsigned char Sensor::getStatus(){
 	return sensorStatus;
 };

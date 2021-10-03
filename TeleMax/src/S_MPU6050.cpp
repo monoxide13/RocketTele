@@ -4,11 +4,12 @@
 
 #include "S_MPU6050.hpp"
 #include "Logging.hpp"
+#define STATUS_OFFSET 2
 
 S_MPU6050::S_MPU6050(){
 	accel = new MPU6050(MPU6050_ADDRESS);
 	sensorStatus=3;
-	TeleMax::dataReady=false;
+	S_MPU6050_int::dataReady=false;
 	accel->initialize();
 	Logging::log(2, "-Testing accel MPU6050 connection... ");
 	if(!accel->testConnection()){
@@ -16,7 +17,7 @@ S_MPU6050::S_MPU6050(){
 		return;
 	}
 	Logging::log(2, "-Connection Successful\n");
-	Logging::log(2, "-Initializing DMP... ");
+	Logging::log(3, "-Initializing DMP... ");
 	devStatus = accel->dmpInitialize();
 	if(devStatus){
 		Logging::log(2, "-DMP Failure: " + String(devStatus) + "\n");
@@ -29,7 +30,7 @@ S_MPU6050::S_MPU6050(){
 	accel->setYAccelOffset(1147);
 	accel->setZAccelOffset(1534);
 	packetSize = accel->dmpGetFIFOPacketSize();
-	Logging::log(3, "-DMP Initialized. Ready for calibration.\n");
+	Logging::log(2, "-MPU6050 DMP Initialized. Ready for calibration.\n");
 	counter=0;
 	sensorStatus=1;
 };
@@ -52,7 +53,7 @@ short S_MPU6050::initialize(){
 	Logging::log(3, "\n-MPU6050 calibration complete.\n");
 	accel->setFullScaleAccelRange(3);
 	accel->setDMPEnabled(true);
-	attachInterrupt(digitalPinToInterrupt(MPU6050_INT_PIN), TeleMax::dmpDataReady, RISING);
+	attachInterrupt(digitalPinToInterrupt(MPU6050_INT_PIN), S_MPU6050_int::callback, RISING);
 	dmpReady=true;
 	sensorStatus=0;
 	return 0;
@@ -61,9 +62,9 @@ short S_MPU6050::initialize(){
 void S_MPU6050::tick(){
 	if(sensorStatus!=0)
 		return;
-	if(TeleMax::dataReady){
+	if(S_MPU6050_int::dataReady){
 		accel->dmpGetCurrentFIFOPacket(fifoBuffer);
-		TeleMax::dataReady=false;
+		S_MPU6050_int::dataReady=false;
 		//Logging::log(3,"FIFO read\n");
 		++counter;
 	}
@@ -79,13 +80,23 @@ double S_MPU6050::getMeasurement(){
 	accel->dmpGetGravity(&gravity, &q);
 	accel->dmpGetLinearAccel(&aaReal, &aa, &gravity);
 	accel->dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-	Logging::log(1, "A:" + String(q.w) + "," + String(q.x) + "," + String(q.y) + "," + String(q.z) + "," + String(aaWorld.x) + "," + String(aaWorld.y) + "," + String(aaWorld.z) + "\n");
+	Logging::log(2, "A:" + String(q.w) + "," + String(q.x) + "," + String(q.y) + "," + String(q.z) + "," + String(aaReal.x) + "," + String(aaReal.y) + "," + String(aaReal.z) + "\n");
 	Logging::log(2, "-FIFO measurements: " + String(counter) + "\n");
-	counter=0;
+	Logging::telemetryData->data.qw = q.w;
+	Logging::telemetryData->data.qx = q.x;
+	Logging::telemetryData->data.qy = q.y;
+	Logging::telemetryData->data.qz = q.z;
+	Logging::telemetryData->data.ax = aaReal.x;
+	Logging::telemetryData->data.ay = aaReal.y;
+	Logging::telemetryData->data.az = aaReal.z;
 	return 0;
 };
 
-volatile bool TeleMax::dataReady;
-void TeleMax::dmpDataReady(){
-	TeleMax::dataReady=true;
+unsigned char S_MPU6050::getStatus(){
+	return sensorStatus << STATUS_OFFSET;
+}
+
+volatile bool S_MPU6050_int::dataReady;
+void S_MPU6050_int::callback(){
+	S_MPU6050_int::dataReady=true;
 };

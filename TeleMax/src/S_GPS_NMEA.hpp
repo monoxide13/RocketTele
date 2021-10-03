@@ -18,7 +18,9 @@ class S_GPS_NMEA : public virtual Sensor{
 	short initialize() override;
 	void tick() override;
 	double getMeasurement() override;
+	unsigned char getStatus() override;
 	private:
 	bool fixLocked;
 	bool newData;
+	bool hasReceivedNMEA;
 };

@@ -17,7 +17,7 @@ namespace SensorGroup{
 	void tick();
 	bool isReady();
 	/* Output is in order sensors are added. Mine is accel, baro, gps */
-	unsigned short getSensorStatus();
+	unsigned short getStatus();
 	extern unsigned short sensorCount;
 	extern struct Sensor_Linked_List * sensors;
 };

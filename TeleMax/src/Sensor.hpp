@@ -14,12 +14,12 @@ class Sensor{
 	/* 1 = start up */
 	/* 2 = */
 	/* 3 = error */
-	unsigned char getSensorStatus();
+	virtual unsigned char getStatus();
 	protected:
-	unsigned long long updateTime;
-	unsigned short measurementReady();
-	unsigned char sensorStatus;
 	Filter1<void>* filter;
+	unsigned short measurementReady();
+	unsigned long long updateTime;
+	unsigned char sensorStatus;
 	private:
 
 };

@@ -13,13 +13,13 @@ class S_MPU6050 : public virtual Sensor{
 	short initialize() override;
 	void tick() override;
 	double getMeasurement() override;
+	unsigned char getStatus() override;
 	private:
 	MPU6050* accel;
 	bool dmpReady;
 	uint8_t mpuIntStatus;
 	uint8_t devStatus;
 	uint16_t packetSize; // default is 42 bytes.
-	uint16_t fifCount;
 	uint8_t fifoBuffer[64];
 	uint16_t counter;
 
@@ -30,9 +30,11 @@ class S_MPU6050 : public virtual Sensor{
 	VectorInt16 aaReal;
 	VectorInt16 aaWorld;
 	VectorFloat gravity;
+	
 };
 
-namespace TeleMax {
-	void dmpDataReady();
+// Interrupt handling
+namespace S_MPU6050_int{
+	void callback();
 	extern volatile bool dataReady;
 };
