@@ -15,6 +15,7 @@ Output BaseStation::packetLed = Output(PACKET_LED_PIN);
 Output BaseStation::readyLed = Output(READY_LED_PIN);
 Output BaseStation::debugLed = Output(SYSTEM_LED_PIN);
 Output BaseStation::systemLed = Output(SYSTEM2_LED_PIN);
+String BaseStation::debugText = "";
 Telemetry BaseStation::telemetry; 
 LiquidCrystal_I2C lcd(0x20, 16, 2);
 
@@ -36,10 +37,10 @@ void setup(void){
 
 	/*** Start the serial ports ***/
 	Serial.begin(192000);
-	while(!Serial.available()){};
-	Serial.println("+Starting...");
 	pinPeripheral(10, PIO_SERCOM); // TX
 	pinPeripheral(11, PIO_SERCOM); // RX
+	//while(!Serial.available()){};
+	Serial.println("+Starting...");
 
 	
 	/*** Set initial values ***/
@@ -56,7 +57,7 @@ void setup(void){
 	}
 	lcd.clear();
 	lcd.print("Ready");
-	delay(2000);
+	delay(1000);
 	snrUpdate=micros();
 };
 
@@ -71,6 +72,8 @@ void loop(void){
 		lcd.print(loopTime);
 		lcd.setCursor(0,1);
 		lcd.print(telemetry.getSNR());
+		lcd.setCursor(5,1);
+		lcd.print(debugText);
 		snrUpdate=loopTime+1000000;
 	}
 	heartbeat();

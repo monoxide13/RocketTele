@@ -15,9 +15,10 @@ class Telemetry{
 	int init();
 	int getSNR();
 	private:
+	inline bool checkPacket(unsigned char *);
 	RH_RF95 * downlink;
-    uint8_t * rxBuffer[RX_BUFFER_LENGTH];
-    unsigned short rxPosition;
+    uint8_t rxBuffer[RX_BUFFER_LENGTH];
+    unsigned short offset;
 	unsigned char rxLength;
 	int snrArray[SNR_HYSTERESIS];
 	unsigned short snrIter;
