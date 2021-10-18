@@ -47,7 +47,7 @@ void S_GPS_NMEA::tick(){
 		sensorStatus=0;
 		if(gps.parse(gps.lastNMEA())){
 			newData=true;
-			Logging::log(1, "-GPS Fix:" + String(gps.fix)+", Quality:" + String(gps.fixquality) + ", Sats:" + String(gps.satellites) + ", HDOP:" + String(gps.HDOP) + "\n");
+			Logging::log(2, "-GPS Fix:" + String(gps.fix)+", Quality:" + String(gps.fixquality) + ", Sats:" + String(gps.satellites) + ", HDOP:" + String(gps.HDOP) + "\n");
 			if(gps.fix){
 				Logging::log(2, "-GPS Lat:" + String(gps.latitude) + String(gps.lat) + ", Lon:" + String(gps.longitude) + String(gps.lon) + ", Alt:" + String(gps.altitude) + "\n");
 			}

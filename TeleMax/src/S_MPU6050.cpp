@@ -59,33 +59,41 @@ short S_MPU6050::initialize(){
 	return 0;
 };
 
+float ypr[3];
+
 void S_MPU6050::tick(){
 	if(sensorStatus!=0)
 		return;
 	if(S_MPU6050_int::dataReady){
 		accel->dmpGetCurrentFIFOPacket(fifoBuffer);
+		accel->dmpGetQuaternion(&q, fifoBuffer);
+		accel->dmpGetAccel(&aa, fifoBuffer);
+		accel->dmpGetGravity(&gravity, &q);
+		accel->dmpGetLinearAccel(&aaReal, &aa, &gravity);
+		accel->dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
 		S_MPU6050_int::dataReady=false;
 		//Logging::log(3,"FIFO read\n");
 		++counter;
 	}
 };
 
-
 double S_MPU6050::getMeasurement(){
 	if(sensorStatus!=0)
 		return 0;
 // Output quarternion and real world accel (acceleration in reference to observer)
-	accel->dmpGetQuaternion(&q, fifoBuffer);
-	accel->dmpGetAccel(&aa, fifoBuffer);
-	accel->dmpGetGravity(&gravity, &q);
-	accel->dmpGetLinearAccel(&aaReal, &aa, &gravity);
-	accel->dmpGetLinearAccelInWorld(&aaWorld, &aaReal, &q);
-	Logging::log(2, "A:" + String(q.w) + "," + String(q.x) + "," + String(q.y) + "," + String(q.z) + "," + String(aaReal.x) + "," + String(aaReal.y) + "," + String(aaReal.z) + "\n");
+	Logging::log(2, "A:" + String(q.w) + "," + String(q.x) + "," + String(q.y) + "," + String(q.z) + "," + String(aa.x) + "," + String(aa.y) + "," + String(aa.z) + "\n");
 	Logging::log(2, "-FIFO measurements: " + String(counter) + "\n");
-	Logging::telemetryData->data.qw = q.w;
+	/*Logging::telemetryData->data.qw = q.w;
 	Logging::telemetryData->data.qx = q.x;
 	Logging::telemetryData->data.qy = q.y;
 	Logging::telemetryData->data.qz = q.z;
+	*/
+
+	accel->dmpGetEuler(ypr, &q);
+	Logging::telemetryData->data.qx = ypr[0];
+	Logging::telemetryData->data.qy = ypr[1];
+	Logging::telemetryData->data.qz = ypr[2];
+
 	Logging::telemetryData->data.ax = aaReal.x;
 	Logging::telemetryData->data.ay = aaReal.y;
 	Logging::telemetryData->data.az = aaReal.z;

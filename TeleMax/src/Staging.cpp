@@ -32,11 +32,11 @@ void Staging::stage_STAGE_PRELAUNCH(){
 		SensorGroup::getMeasurement();
 		Logging::log(2, "-Staging: Loop counter at measurement time: " + String(loopCounter) + "\n");
 		Logging::telemetryData->data.timer = TeleMax::loopTime;
-		Logging::telemetryData->data.crc = calculateCRC(Logging::telemetryData);
+		//Logging::telemetryData->data.crc = calculateCRC(Logging::telemetryData);
 		Logging::log(1, "T:");
 		Logging::log(1, (char*)&(Logging::telemetryData->data), TELEMETRY_PACKET_LENGTH);
-		nextMeasurementTime = TeleMax::loopTime + 1000000/LOG_RATE;
 		Logging::log(1, "\n");
+		nextMeasurementTime = TeleMax::loopTime + 1000000/LOG_RATE;
 		loopCounter=0;
 	}
 };

@@ -13,8 +13,8 @@
 #define LOGGING_STATUS_OFFSET_SD(x)			x<<2
 #define LOGGING_STATUS_OFFSET_USB(x)		x<<0
 
-#define TX_BUFFER_SIZE 64
-#define TX_POWER 3 // 2-20
+#define TX_BUFFER_SIZE 128
+#define TX_POWER 2 // 2-20
 
 namespace {
 	char loggingStatus;
@@ -52,9 +52,13 @@ void Logging::init(){
 		#endif
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
 		downlink->setModemConfig(RH_RF95::Bw500Cr45Sf128);
+		// Throughput is 977bps @ -138dbm
+		downlink->setSpreadingFactor(10);
+		downlink->setSignalBandwidth(125000);
+		downlink->setCodingRate4(5);
 		downlink->setTxPower(TX_POWER); // Valid values 2-20
 		downlink->setModeRx(); // Start listening.
-		downlink->setCADTimeout(0);
+		//downlink->setCADTimeout(0);
 		#if LOG_USB > 0
 		Logging::log(2, "-Downlink Started.\n");
 		#endif
@@ -117,8 +121,10 @@ void Logging::log(unsigned char level, String input){
 	#endif
 	#if LOG_DOWNLINK > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
-		input.toCharArray(sendBuffer, TX_BUFFER_SIZE);
-		downlink->send((uint8_t*)sendBuffer, TX_BUFFER_SIZE);
+		input.toCharArray(sendBuffer, input.length()+1); // +1 required to allow space for null terminator which will be trimmed off later.
+		downlink->send((uint8_t*)sendBuffer, input.length());
+		//Serial.println("=Downlink Sent 1. Length: " + String(input.length()));
+		downlink->waitPacketSent();
 	}
 	#endif
 
@@ -128,6 +134,15 @@ void Logging::log(unsigned char level, char* input, unsigned short length){
 	#if LOG_USB > 0
 	if( level <= LOG_USB & !(~loggingStatus & LOGGING_STATUS_MASK_USB)){
 		Serial.write(input, length);
+		/* // Prints out data in HEX.
+		int x;
+		for(x=0; x<length; ++x){
+			if(input[x]<0x10)
+				Serial.print('0');
+			Serial.print(input[x], HEX);
+			Serial.print(" ");
+		}
+		// */	
 	}
 	#endif
 	#if LOG_SD > 0
@@ -137,7 +152,9 @@ void Logging::log(unsigned char level, char* input, unsigned short length){
 	#endif
 	#if LOG_DOWNLINK > 0
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
-		downlink->send((unsigned char *)input, length);
+		downlink->send((uint8_t *)input, length);
+		//Serial.println("=Downlink Sent 2. Length: " + String(length));
+		downlink->waitPacketSent();
 	}
 	#endif
 };
