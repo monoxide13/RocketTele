@@ -34,6 +34,7 @@ union Telemetry_Packet * Logging::telemetryData;
 void Logging::init(){
 	// Set downlink packet to ptr on 16bit boundary.
 	Logging::telemetryData = (union Telemetry_Packet *)(downlinkPacket + 4);
+	downlinkPacket[1]='\n';
 	downlinkPacket[2]='T';
 	downlinkPacket[3]=':';
 	downlinkPacket[TELEMETRY_PACKET_LENGTH+4]='\n'; // 4 initial bits, then packet, then newline.
@@ -181,6 +182,7 @@ void Logging::flush(){
 
 void Logging::sendTelemetry(){
 	#if LOG_USB > 0
+	Serial.write(downlinkPacket+2, TELEMETRY_PACKET_LENGTH+3);
 	/* // Prints out data in HEX.
 	int length=TELEMETRY_PACKET_LENGTH+3;
 	int x;
