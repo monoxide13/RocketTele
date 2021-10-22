@@ -3,6 +3,7 @@
 #include "Logging.hpp"
 #include "SD.h"
 #include "RH_RF95.h"
+#include <cmath>
 
 #define LOGGING_STATUS_MASK_UNUSED			B11000000
 #define LOGGING_STATUS_MASK_DOWNLINK		B00110000
@@ -21,14 +22,21 @@ namespace {
 	bool ready; // A faster temp way to know if files open.
 	File logFile;
 	#if LOG_DOWNLINK > 0
-	RH_RF95* downlink;
 	char sendBuffer[TX_BUFFER_SIZE];
 	#endif
+	RH_RF95* downlink;
+	// This must be defined like this so the telemetryPacket can be accessed on 2&4 byte boundaries. If not, causes hard fault and stops MCU. See adafruits write-up on aligned memory access. It should work on 16-bit boundary, but no reason to risk it.
+	uint8_t * downlinkPacket = (uint8_t*) new uint32_t[(int)ceil(TELEMETRY_PACKET_LENGTH/4)+2];
 }
 
-union Telemetry_Packet * Logging::telemetryData = new union Telemetry_Packet;
+union Telemetry_Packet * Logging::telemetryData;
 
 void Logging::init(){
+	// Set downlink packet to ptr on 16bit boundary.
+	Logging::telemetryData = (union Telemetry_Packet *)(downlinkPacket + 4);
+	downlinkPacket[2]='T';
+	downlinkPacket[3]=':';
+	downlinkPacket[TELEMETRY_PACKET_LENGTH+4]='\n'; // 4 initial bits, then packet, then newline.
 	Telemetry_Packet_Init(Logging::telemetryData);
 	ready=false;
 	loggingStatus=0;
@@ -44,7 +52,9 @@ void Logging::init(){
 	#endif
 
 	#if LOG_DOWNLINK > 0
+	Serial.println("-Downlink init starting");
 	downlink = new RH_RF95(RF95_CS_PIN, RF95_IRQ0_PIN, hardware_spi);
+	Serial.println("-Downlink init");
 	if(downlink->init()){
 		#if LOG_USB > 0
 		Serial.print("-Getting RF95 version: ");
@@ -124,7 +134,6 @@ void Logging::log(unsigned char level, String input){
 		input.toCharArray(sendBuffer, input.length()+1); // +1 required to allow space for null terminator which will be trimmed off later.
 		downlink->send((uint8_t*)sendBuffer, input.length());
 		//Serial.println("=Downlink Sent 1. Length: " + String(input.length()));
-		downlink->waitPacketSent();
 	}
 	#endif
 
@@ -154,21 +163,40 @@ void Logging::log(unsigned char level, char* input, unsigned short length){
 	if( level <= LOG_DOWNLINK & !(~loggingStatus & LOGGING_STATUS_MASK_DOWNLINK)){
 		downlink->send((uint8_t *)input, length);
 		//Serial.println("=Downlink Sent 2. Length: " + String(length));
-		downlink->waitPacketSent();
 	}
 	#endif
 };
 
 void Logging::flush(){
-	#ifdef LOG_USB > 0
+	#if LOG_USB > 0
 	Serial.flush();
 	#endif
-	#ifdef LOG_SD > 0
+	#if LOG_SD > 0
 	logFile.flush();
 	#endif
-	#ifdef LOG_DOWNLINK > 0
+	#if LOG_DOWNLINK > 0
+	downlink->waitPacketSent(); // Possibly time intensive
 	#endif
 };
+
+void Logging::sendTelemetry(){
+	#if LOG_USB > 0
+	/* // Prints out data in HEX.
+	int length=TELEMETRY_PACKET_LENGTH+3;
+	int x;
+	for(x=2; x<length+2; ++x){
+		if(downlinkPacket[x]<0x10)
+			Serial.print('0');
+		Serial.print(downlinkPacket[x], HEX);
+		Serial.print(" ");
+	}
+	Serial.println();
+	// */
+	#endif
+	#if LOG_DOWNLINK > 0
+	downlink->send(downlinkPacket+2, (uint8_t)TELEMETRY_PACKET_LENGTH+3);
+	#endif
+}
 
 bool Logging::loggingReady(){
 	return ready;

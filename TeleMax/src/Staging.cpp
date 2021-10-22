@@ -24,7 +24,7 @@ void Staging::stage_STAGE_INIT(){
 
 void Staging::stage_STAGE_PRELAUNCH(){
 	if(loopCounter == 0){ // First loop in this stage
-		Logging::log(3,"First run of Stage_Prelaunch");
+		Logging::log(3,"First run of Stage_Prelaunch\n");
 	}
 
 	if(TeleMax::loopTime > nextMeasurementTime){
@@ -32,10 +32,8 @@ void Staging::stage_STAGE_PRELAUNCH(){
 		SensorGroup::getMeasurement();
 		Logging::log(2, "-Staging: Loop counter at measurement time: " + String(loopCounter) + "\n");
 		Logging::telemetryData->data.timer = TeleMax::loopTime;
-		//Logging::telemetryData->data.crc = calculateCRC(Logging::telemetryData);
-		Logging::log(1, "T:");
-		Logging::log(1, (char*)&(Logging::telemetryData->data), TELEMETRY_PACKET_LENGTH);
-		Logging::log(1, "\n");
+		Logging::telemetryData->data.crc = calculateCRC(Logging::telemetryData);
+		Logging::sendTelemetry();
 		nextMeasurementTime = TeleMax::loopTime + 1000000/LOG_RATE;
 		loopCounter=0;
 	}

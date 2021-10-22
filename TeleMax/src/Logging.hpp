@@ -13,9 +13,10 @@ namespace Logging{
 	void closeFile();
 	void log(unsigned char, String);
 	void log(unsigned char, char*, unsigned short);
-	bool loggingReady();
 	void flush();
-
+	void sendTelemetry();
+	bool loggingReady();
+	
 	extern union Telemetry_Packet * telemetryData;
 
 	// Private: Defined in Logging.cpp
