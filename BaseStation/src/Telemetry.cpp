@@ -12,6 +12,7 @@ Telemetry::Telemetry(){
 	}
 	snrIter=0;
 	offset=0;
+	lastGoodTime=0;
 };
 
 Telemetry::~Telemetry(){
@@ -55,9 +56,10 @@ bool Telemetry::receive(){
 			if(offset >= TELEMETRY_PACKET_LENGTH+2){
 				if(rxBuffer[0]=='T' && rxBuffer[1]==':'){
 					keepLooping = true;
-					if(checkPacket(rxBuffer)){
+					if(checkPacket((Telemetry_Packet *)rxBuffer)){
+						lastGoodTime = millis();
 						// Packet is valid, process and shift.
-						// TODO: Process packet.
+						processPacket((Telemetry_Packet *)rxBuffer);
 		   				Serial.write((uint8_t*)rxBuffer, TELEMETRY_PACKET_LENGTH+2);
 				/*		 // Prints out packet in HEX.
 						int x;
@@ -119,11 +121,15 @@ int Telemetry::getSNR(){
 	for(x=0; x<SNR_HYSTERESIS; ++x){
 		sum+=snrArray[x];
 	}
-	//return floor(sum/SNR_HYSTERESIS);
+	BaseStation::debugText = String(downlink->rxGood()) + ":" + String(downlink->rxBad());
 	return snrArray[0];
 };
 
-bool Telemetry::checkPacket(unsigned char * ptr){
+bool Telemetry::checkPacket(Telemetry_Packet * ptr){
 	// TODO: Validate CRC.
 	return true;
+}
+
+void Telemetry::processPacket(Telemetry_Packet * ptr){
+	ptr->data.crc = (uint16_t)downlink->lastSNR();
 }

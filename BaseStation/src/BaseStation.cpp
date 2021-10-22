@@ -59,6 +59,8 @@ void setup(void){
 	lcd.print("Ready");
 	delay(1000);
 	snrUpdate=micros();
+	lcd.clear();
+	lcd.print("TSP: ");
 };
 
 void loop(void){
@@ -68,13 +70,18 @@ void loop(void){
 		Serial.read();
 	}
 	if(snrUpdate<loopTime){
-		lcd.clear();
-		lcd.print(loopTime);
+		//lcd.clear();
+		float time = (millis() - telemetry.lastGoodTime)/(float)1000;
+		lcd.setCursor(5,0);
+		if(time<100)
+			lcd.print(String(time, 1) + "   ");
+		else
+			lcd.print(String(time, 0) + "   ");
 		lcd.setCursor(0,1);
-		lcd.print(telemetry.getSNR());
-		lcd.setCursor(5,1);
+		lcd.print(String(telemetry.getSNR()) + "  ");
+		lcd.setCursor(7,1);
 		lcd.print(debugText);
-		snrUpdate=loopTime+1000000;
+		snrUpdate=loopTime+100000;
 	}
 	heartbeat();
 };
