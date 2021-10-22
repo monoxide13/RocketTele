@@ -95,6 +95,7 @@ void loop(void){
 	loopTime = micros();
 	// Execute staging and sensor commands
 	Staging::staging();
+	SensorGroup::tick();
 	// Update outputs
 	heartbeat();
 	// Check for inputs
@@ -112,7 +113,6 @@ void loop(void){
 };
 
 inline void TeleMax::heartbeat(){
-	SensorGroup::tick();
 	debugLed.tick();
 	buzzer.tick();
 	systemLed.tick();

@@ -98,7 +98,7 @@ double S_MPU6050::getMeasurement(){
 	Logging::telemetryData->data.qy = q.y;
 	Logging::telemetryData->data.qz = q.z;
 	*/
-	Logging::log(2, "-A: measurements taken: " + String(counter) + "\n");
+	//Logging::log(2, "-A: measurements taken: " + String(counter) + "\n");
 	counter=0;
 	accel->dmpGetEuler(ypr, &q);
 	Logging::telemetryData->data.qx = ypr[0];
