@@ -62,7 +62,7 @@ short S_BMP388::initialize(){
 	baro->setPresOversampling(OVERSAMPLING_X2);
 	baro->setTempOversampling(OVERSAMPLING_SKIP);
 	baro->setIIRFilter(IIR_FILTER_OFF);
-	baro->setTimeStandby(TIME_STANDBY_40MS);
+	baro->setTimeStandby(TIME_STANDBY_160MS);
 	attachInterrupt(digitalPinToInterrupt(BMP388_INT_PIN), S_BMP388_int::callback, RISING);
 	baro->enableInterrupt(PUSH_PULL, ACTIVE_HIGH, UNLATCHED);
 	baro->startNormalConversion();

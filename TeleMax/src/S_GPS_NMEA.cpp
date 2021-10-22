@@ -11,7 +11,7 @@ S_GPS_NMEA::S_GPS_NMEA(){
 	newData=false;
 	sensorStatus=1;
 	gps.begin(9600);
-	Logging::log(3, "-GPS Added\n");
+	Logging::log(2, "-GPS Added\n");
 	gps.sendCommand(PMTK_SET_NMEA_OUTPUT_GGAONLY);
 	hasReceivedNMEA=false;
 };
@@ -28,12 +28,16 @@ short S_GPS_NMEA::initialize(){
 	}
 	Logging::log(3, "\n");
 	gps.sendCommand(PMTK_SET_BAUD_57600);
-	Serial1.flush();
 	delay(1000);
+	Serial1.flush();
 	Serial1.end();
 	delay(1000);
 	gps.begin(57600);
 	delay(1000);
+	while(Serial1.available()){
+		Serial1.read();
+		Logging::log(3,",");
+	}
 	//gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
 	gps.sendCommand(PMTK_SET_NMEA_UPDATE_2HZ);
 	sensorStatus=2;
@@ -43,7 +47,7 @@ short S_GPS_NMEA::initialize(){
 void S_GPS_NMEA::tick(){
 	gps.read();
 	if(gps.newNMEAreceived()){
-		Logging::log(3, "-NMEA " + String(gps.lastNMEA()) + "\n");
+		Logging::log(2, "-NMEA " + String(gps.lastNMEA()) + "\n");
 		sensorStatus=0;
 		if(gps.parse(gps.lastNMEA())){
 			newData=true;
