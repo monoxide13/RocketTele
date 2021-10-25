@@ -5,6 +5,8 @@
 #include "BaseStation.hpp"
 #include "packet_def.h"
 
+#define TX_FREQ 904.5 // In MHz
+
 Telemetry::Telemetry(){
 	RH_RF95 * downlink;
 	for(snrIter=0; snrIter<SNR_HYSTERESIS; ++snrIter){
@@ -27,14 +29,8 @@ int Telemetry::init(){
 	}
 	Serial.print("+BaseStation downlink version:");
 	Serial.println((uint8_t)downlink->getDeviceVersion());
+	downlink->setFrequency(TX_FREQ);
     downlink->setModemConfig(RH_RF95::Bw500Cr45Sf128);
-	// Other settings are mixed in that are being missed.
-/*	RH_RF95::ModemConfig * mCfg = new RH_RF95::ModemConfig;
-	mCfg->reg_1d = RH_RF95::RH_RF95_BW_125000;
-	mCfg->reg_1e = RH_RF95::RH_RF95_SPREADING_FACTOR_1024CPS;
-	mCfg->reg_26 = 
-	downlink->setModemRegisters(mCfg);
-*/
 	downlink->setSpreadingFactor(10);
 	downlink->setSignalBandwidth(125000);
 	downlink->setCodingRate4(5);
