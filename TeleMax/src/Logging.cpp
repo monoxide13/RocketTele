@@ -15,7 +15,8 @@
 #define LOGGING_STATUS_OFFSET_USB(x)		x<<0
 
 #define TX_BUFFER_SIZE 128
-#define TX_POWER 2 // 2-20
+#define TX_POWER 15 // 2-20
+#define TX_FREQ 904.5 // in MHz
 
 namespace {
 	char loggingStatus;
@@ -62,6 +63,7 @@ void Logging::init(){
 		Serial.println((uint8_t)downlink->getDeviceVersion()); // Should return 18
 		#endif
 		loggingStatus = loggingStatus & ~LOGGING_STATUS_MASK_DOWNLINK | LOGGING_STATUS_OFFSET_DOWNLINK(3);
+		downlink->setFrequency(TX_FREQ);
 		downlink->setModemConfig(RH_RF95::Bw500Cr45Sf128);
 		// Throughput is 977bps @ -138dbm
 		downlink->setSpreadingFactor(10);

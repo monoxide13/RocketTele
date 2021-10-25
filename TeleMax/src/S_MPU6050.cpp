@@ -93,18 +93,13 @@ double S_MPU6050::getMeasurement(){
 	Logging::log(2, "A:" + String(q.w) + "," + String(q.x) + "," + String(q.y) + "," + String(q.z) + "," + String(aa.x) + "," + String(aa.y) + "," + String(aa.z) + "\n");
 	// */
 // Output quarternion and real world accel (acceleration in reference to observer)
-	/*Logging::telemetryData->data.qw = q.w;
+	Logging::telemetryData->data.qw = q.w;
 	Logging::telemetryData->data.qx = q.x;
 	Logging::telemetryData->data.qy = q.y;
 	Logging::telemetryData->data.qz = q.z;
-	*/
-	//Logging::log(2, "-A: measurements taken: " + String(counter) + "\n");
+	
+	Logging::log(2, "-A: measurements taken: " + String(counter) + "\n");
 	counter=0;
-	accel->dmpGetEuler(ypr, &q);
-	Logging::telemetryData->data.qx = ypr[0];
-	Logging::telemetryData->data.qy = ypr[1];
-	Logging::telemetryData->data.qz = ypr[2];
-
 	Logging::telemetryData->data.ax = aaReal.x;
 	Logging::telemetryData->data.ay = aaReal.y;
 	Logging::telemetryData->data.az = aaReal.z;
