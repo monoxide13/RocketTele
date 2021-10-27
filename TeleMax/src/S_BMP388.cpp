@@ -40,10 +40,10 @@ short S_BMP388::initialize(){
 	baro->setPresOversampling(OVERSAMPLING_X32);
 	baro->setTempOversampling(OVERSAMPLING_X2);
 	baro->setIIRFilter(IIR_FILTER_OFF);
-	for(x=0; x<5; ++x){
+	for(x=0; x<10; ++x){
 		baro->startForcedConversion();
 		float tTemp, tPres, tAlt;
-		delay(100);
+		delay(50);
 		if(!(baro->getMeasurements(tTemp, tPres, tAlt))){
 			--x;
 			continue;
