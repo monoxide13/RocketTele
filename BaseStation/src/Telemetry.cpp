@@ -4,8 +4,12 @@
 #include "global.hpp"
 #include "BaseStation.hpp"
 #include "packet_def.h"
+#include "StatusLEDs.hpp"
 
-#define TX_FREQ 904.5 // In MHz
+#define TX_FREQ 434.3 // In MHz
+
+uint32_t Ptimer;
+uint16_t Pbalt;
 
 Telemetry::Telemetry(){
 	RH_RF95 * downlink;
@@ -59,7 +63,6 @@ bool Telemetry::receive(){
 		   				Serial.write((uint8_t*)rxBuffer, TELEMETRY_PACKET_LENGTH+2);
 				/*		 // Prints out packet in HEX.
 						int x;
-						Serial.println("1");
 						Serial.flush();
 						for(x=0; x<TELEMETRY_PACKET_LENGTH+2; ++x){
 							if(rxBuffer[x]<0x10)
@@ -106,6 +109,7 @@ bool Telemetry::receive(){
 		//Serial.flush();
 		//snrArray[snrIter]=downlink->lastSNR();
 		snrArray[0]=downlink->lastSNR();
+		StatusLEDs::setRX((float)snrArray[0]);
 		//if(++snrIter>=SNR_HYSTERESIS)
 		//	snrIter=0;
 	}
@@ -128,4 +132,15 @@ bool Telemetry::checkPacket(Telemetry_Packet * ptr){
 
 void Telemetry::processPacket(Telemetry_Packet * ptr){
 	ptr->data.crc = (uint16_t)downlink->lastSNR();
+	// GPS fixqual, first 2 bits 1=noFix 2=2D 3=3D
+	if(ptr->data.fixqual && 0b11000000 == 0b01000000) // noFix
+		StatusLEDs::setGPS(-2);
+	else if(ptr->data.fixqual && 0b11000000 == 0b10000000)
+		StatusLEDs::setGPS(-1);
+	else if(ptr->data.fixqual && 0b11000000 == 0b11000000)
+		StatusLEDs::setGPS(ptr->data.hdop);
+	// Calculate Vertical velocitiy
+	// ptr->data.balt   .timer
+	// Ptimer. Pbalt.
+
 }

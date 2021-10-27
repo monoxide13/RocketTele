@@ -14,9 +14,13 @@
 #define LOGGING_STATUS_OFFSET_SD(x)			x<<2
 #define LOGGING_STATUS_OFFSET_USB(x)		x<<0
 
+// RF96 is reted for 433-470. Although 432.5 worked fine, so use that if 434.3 is unusable.
+// 70cm Amateur band leaves 433-450.
+// Stay under 440 to avoid repeaters.
+// 433-435 Aux/Rptr links. 435-438 Satellite ops. 438-444 ATV rptr.
+#define TX_FREQ 434.3 // in MHz
+#define TX_POWER 5 // 2-20
 #define TX_BUFFER_SIZE 128
-#define TX_POWER 15 // 2-20
-#define TX_FREQ 904.5 // in MHz
 
 namespace {
 	char loggingStatus;
