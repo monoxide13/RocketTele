@@ -25,3 +25,12 @@
 [submodule "libraries/BMP388_DEV"]
 	path = libraries/BMP388_DEV
 	url = ssh://git@github.com/monoxide13/BMP388_DEV.git
+[submodule "libraries/Adafruit_NeoPixel_ZeroDMA"]
+	path = libraries/Adafruit_NeoPixel_ZeroDMA
+	url = https://github.com/adafruit/Adafruit_NeoPixel_ZeroDMA
+[submodule "libraries/Adafruit_NeoPixel"]
+	path = libraries/Adafruit_NeoPixel
+	url = https://github.com/adafruit/Adafruit_NeoPixel
+[submodule "libraries/Adafruit_ZeroDMA"]
+	path = libraries/Adafruit_ZeroDMA
+	url = https://github.com/adafruit/Adafruit_ZeroDMA

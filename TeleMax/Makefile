@@ -70,7 +70,8 @@ ELFFLAGS := -Os -Wl,--gc-sections -save-temps --specs=nano.specs --specs=nosys.s
 # -------------------------------------------------------------------------------------------------------------
 DEFINES := -DF_CPU=$(BOARD_BUILD_FCPU) -DARDUINO=10605 -DARDUINO_$(BOARD_BOARD) -DARDUINO_ARCH_SAMD \
 	-D__SAMD21G18A__ -DUSB_VID=$(BOARD_USB_VID) -DUSB_PID=$(BOARD_USB_PID) -DUSBCON \
-	-DUSB_MANUFACTURER=\"$(BOARD_USB_MANUFACTURER)\" -DUSB_PRODUCT=\"$(BOARD_USB_PRODUCT)\"
+	-DUSB_MANUFACTURER=\"$(BOARD_USB_MANUFACTURER)\" -DUSB_PRODUCT=\"$(BOARD_USB_PRODUCT)\"\
+	-DADAFRUIT_FEATHER_M0
 
 # Includes
 # -------------------------------------------------------------------------------------------------------------
