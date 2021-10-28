@@ -20,9 +20,7 @@ String BaseStation::debugText = "";
 Telemetry BaseStation::telemetry; 
 LiquidCrystal_I2C lcd(0x20, 16, 2);
 
-namespace {
-	unsigned long long snrUpdate;
-}
+unsigned long long displayUpdate;
 
 void setup(void){
 	/*** Configure pins ***/
@@ -62,7 +60,7 @@ void setup(void){
 	}
 	lcd.clear();
 	systemLed.repeat({1,0});
-	snrUpdate=micros();
+	displayUpdate=0;
 	lcd.print("TSP: ");
 };
 
@@ -72,7 +70,7 @@ void loop(void){
 	if(Serial.available()){
 		Serial.read();
 	}
-	if(snrUpdate<loopTime){
+	if(displayUpdate<loopTime){
 		//lcd.clear();
 		float time = (millis() - telemetry.lastGoodTime)/(float)1000;
 		lcd.setCursor(5,0);
@@ -83,8 +81,8 @@ void loop(void){
 		lcd.setCursor(0,1);
 		lcd.print(String(telemetry.getSNR()) + "  ");
 		lcd.setCursor(7,1);
-		lcd.print(debugText);
-		snrUpdate=loopTime+100000;
+		lcd.print(String(telemetry.downlink->rxGood()) + ":" + String(telemetry.downlink->rxBad()));
+		displayUpdate=loopTime+100000; // 10 times per second
 	}
 	heartbeat();
 };
