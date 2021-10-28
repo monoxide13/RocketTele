@@ -15,6 +15,10 @@ namespace StatusLEDs{
 	void initialize();
 	void test();
 	void tick();
+	namespace {
+		float previousRX;
+		float previousGPS;
+	}
 #define VV_MAX 50
 #define VV_MIN 0
 	inline void setVV(float){
@@ -24,7 +28,6 @@ namespace StatusLEDs{
 	inline void setGPS(float value){
 		if(value>GPS_MAX)
 			value=GPS_MAX;
-		static float previousGPS;
 		if(value==previousGPS)
 			return;
 		if(value==-1) // No fix!
@@ -46,7 +49,6 @@ namespace StatusLEDs{
 			value=RX_MAX;
 		else if(value<RX_MIN)
 			value=RX_MIN;
-		static float previousRX;
 		if(value==previousRX)
 			return;
 		neo->setPixelColor(3, neo->gamma32( \
