@@ -26,7 +26,7 @@ void Output::tick(){
 			commands.push_back(commands.front());
 			commands.pop_front();
 		}
-	nextTickTime = TeleMax::loopTime + OUTPUT_SWITCH_TIME;
+	nextTickTime = TeleMax::loopTime + OUTPUT_SWITCH_TIME*1000;
 	}
 
 };
@@ -44,7 +44,7 @@ void Output::blocking(std::list<bool> input){
 		input.pop_front();
 		delay(OUTPUT_SWITCH_TIME);
 	}
-	nextTickTime = TeleMax::loopTime + OUTPUT_SWITCH_TIME;
+	nextTickTime = TeleMax::loopTime + OUTPUT_SWITCH_TIME*1000;
 };
 void Output::repeat(std::list<bool> input){
 	repeating=true;

@@ -84,7 +84,7 @@ void setup(void){
 		}
 	};
 	Logging::log(3, ". Delay complete.\n");
-	debugLed.blocking({1,1,0,0,1,1,0,0,1,1,0,0});
+	debugLed.repeat({1,1,0});
 	
 	/*** Output some values for the logs ***/
 	Logging::log(2, "-Measurement Rate (Hz): " + String(LOG_RATE) + "\n");
