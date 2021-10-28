@@ -7,6 +7,7 @@
 #include "Output.hpp"
 #include "Telemetry.hpp"
 #include "LiquidCrystal_I2C.h"
+#include "StatusLEDs.hpp"
 
 using namespace BaseStation;
 
@@ -30,25 +31,29 @@ void setup(void){
 	pinMode(RF95_RST_PIN, OUTPUT);
 	digitalWrite(RF95_RST_PIN, HIGH);
 	pinMode(VOLTAGE_PIN, INPUT);
+
+
 	
 	/*** Start the bus ***/
 	Wire.begin();
 	SPI.begin();
 
+
 	/*** Start the serial ports ***/
 	Serial.begin(192000);
-	pinPeripheral(10, PIO_SERCOM); // TX
-	pinPeripheral(11, PIO_SERCOM); // RX
 	//while(!Serial.available()){};
 	Serial.println("+Starting...");
 
+	StatusLEDs::initialize();
 	
 	/*** Set initial values ***/
-	lcd.init();
-	lcd.backlight();
 	readyLed.turnOff();
 	debugLed.turnOff();
-	systemLed.repeat({1,0});
+	lcd.init();
+	lcd.clear();
+	lcd.backlight();
+	lcd.print("Ready");
+	StatusLEDs::test();
 	Serial.println("+Starting Telemetry");
 	if(!telemetry.init()){
 		Serial.println("+Downlink OK");
@@ -56,10 +61,8 @@ void setup(void){
 		Serial.println("+Downlink BAD");
 	}
 	lcd.clear();
-	lcd.print("Ready");
-	delay(1000);
+	systemLed.repeat({1,0});
 	snrUpdate=micros();
-	lcd.clear();
 	lcd.print("TSP: ");
 };
 
@@ -87,6 +90,7 @@ void loop(void){
 };
 
 inline void BaseStation::heartbeat(){
+	StatusLEDs::tick();
 	readyLed.tick();
 	debugLed.tick();
 	systemLed.tick();
