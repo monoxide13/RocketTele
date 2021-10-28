@@ -6,6 +6,7 @@
 #include "global.hpp"
 #include "Stream.h"
 #include "packet_def.h"
+#include "RH_RF95.h"
 
 namespace Logging{
 	void init();
@@ -17,6 +18,7 @@ namespace Logging{
 	void sendTelemetry();
 	bool loggingReady();
 	
+	extern RH_RF95* downlink;
 	extern union Telemetry_Packet * telemetryData;
 
 	// Private: Defined in Logging.cpp

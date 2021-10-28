@@ -2,7 +2,6 @@
 
 #include "Logging.hpp"
 #include "SD.h"
-#include "RH_RF95.h"
 #include <cmath>
 
 #define LOGGING_STATUS_MASK_UNUSED			B11000000
@@ -29,11 +28,11 @@ namespace {
 	#if LOG_DOWNLINK > 0
 	char sendBuffer[TX_BUFFER_SIZE];
 	#endif
-	RH_RF95* downlink;
 	// downlinkPacket must be defined like this so the telemetryPacket can be accessed on 2&4 byte boundaries. If not, causes hard fault and stops MCU. See adafruits write-up on aligned memory access. It should work on 16-bit boundary, but no reason to risk it.
 	uint8_t * downlinkPacket = (uint8_t*) new uint32_t[(int)ceil(TELEMETRY_PACKET_LENGTH/4)+2];
 }
 
+RH_RF95* Logging::downlink;
 union Telemetry_Packet * Logging::telemetryData;
 
 void Logging::init(){
