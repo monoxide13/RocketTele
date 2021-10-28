@@ -106,23 +106,23 @@ bool Telemetry::receive(){
 
 		//RH_RF95::printBuffer("Buffer:", (uint8_t*)rxBuffer, test);
 		//Serial.println("Length: " + String(test));
-		//Serial.flush();
-		//snrArray[snrIter]=downlink->lastSNR();
-		snrArray[0]=downlink->lastSNR();
-		StatusLEDs::setRX((float)snrArray[0]);
-		//if(++snrIter>=SNR_HYSTERESIS)
-		//	snrIter=0;
+		snrArray[snrIter]=downlink->lastSNR();
+		Serial.print("R:");
+		Serial.println(snrArray[snrIter]);
+		StatusLEDs::setRX(getSNR());
+		if(++snrIter>=SNR_HYSTERESIS)
+			snrIter=0;
+		BaseStation::debugText = String(downlink->rxGood()) + ":" + String(downlink->rxBad());
 	}
 	return true;
 };
 
-int Telemetry::getSNR(){
+float Telemetry::getSNR(){
 	int x, sum=0;
 	for(x=0; x<SNR_HYSTERESIS; ++x){
 		sum+=snrArray[x];
 	}
-	BaseStation::debugText = String(downlink->rxGood()) + ":" + String(downlink->rxBad());
-	return snrArray[0];
+	return sum/SNR_HYSTERESIS;
 };
 
 bool Telemetry::checkPacket(Telemetry_Packet * ptr){
@@ -131,16 +131,12 @@ bool Telemetry::checkPacket(Telemetry_Packet * ptr){
 }
 
 void Telemetry::processPacket(Telemetry_Packet * ptr){
-	ptr->data.crc = (uint16_t)downlink->lastSNR();
-	// GPS fixqual, first 2 bits 1=noFix 2=2D 3=3D
-	if(ptr->data.fixqual && 0b11000000 == 0b01000000) // noFix
-		StatusLEDs::setGPS(-2);
-	else if(ptr->data.fixqual && 0b11000000 == 0b10000000)
+	if(ptr->data.fixqual && 0b11000000 == 0b00000000) // noFix
 		StatusLEDs::setGPS(-1);
-	else if(ptr->data.fixqual && 0b11000000 == 0b11000000)
+	else
 		StatusLEDs::setGPS(ptr->data.hdop);
-	// Calculate Vertical velocitiy
-	// ptr->data.balt   .timer
-	// Ptimer. Pbalt.
-
+	// Calculate Vertical velocitiy in m/s
+	float change = (ptr->data.timer-Ptimer) / (ptr->data.balt-Pbalt) * 10; // *10 to convert 1/10sec to secs.
+	Serial.print("+Vertical Velocity in m/s:");
+	Serial.println(change);
 }
