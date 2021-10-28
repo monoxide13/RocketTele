@@ -12,7 +12,6 @@ namespace BaseStation{
 	extern unsigned long packetTime;
 	extern Output readyLed;
 	extern Output debugLed;
-	extern Output systemLed;
 	extern String debugText;
 	extern Telemetry telemetry;
 	void heartbeat();

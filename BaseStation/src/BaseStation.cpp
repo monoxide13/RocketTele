@@ -15,7 +15,6 @@ unsigned long BaseStation::loopTime=0;
 Output BaseStation::packetLed = Output(PACKET_LED_PIN);
 Output BaseStation::readyLed = Output(READY_LED_PIN);
 Output BaseStation::debugLed = Output(SYSTEM_LED_PIN);
-Output BaseStation::systemLed = Output(SYSTEM2_LED_PIN);
 String BaseStation::debugText = "";
 Telemetry BaseStation::telemetry; 
 LiquidCrystal_I2C lcd(0x20, 16, 2);
@@ -29,6 +28,7 @@ void setup(void){
 	pinMode(RF95_RST_PIN, OUTPUT);
 	digitalWrite(RF95_RST_PIN, HIGH);
 	pinMode(VOLTAGE_PIN, INPUT);
+
 
 
 	
@@ -59,7 +59,8 @@ void setup(void){
 		Serial.println("+Downlink BAD");
 	}
 	lcd.clear();
-	systemLed.repeat({1,0});
+	debugLed.repeat({1,0});
+	packetLed.blocking({1,0,1,0});
 	displayUpdate=0;
 	lcd.print("TSP: ");
 };
@@ -91,6 +92,5 @@ inline void BaseStation::heartbeat(){
 	StatusLEDs::tick();
 	readyLed.tick();
 	debugLed.tick();
-	systemLed.tick();
 };
 

@@ -16,10 +16,9 @@
 // D9, AIN 7				// SERCOM0.3 Battery voltage. 2v fully charge.
 
 #define VOLTAGE_PIN	A7			// Battery voltage. 2v fully charged. aR()*6.6/1024 
-#define PACKET_LED_PIN 13		// Also onboard LED
-#define READY_LED_PIN 13		// Also onboard LED
-#define SYSTEM_LED_PIN 13		// Also onboard LED
-#define SYSTEM2_LED_PIN 13		// Second led onboard. No physical pin.
+#define PACKET_LED_PIN A1
+#define READY_LED_PIN A2
+#define SYSTEM_LED_PIN 13		// Onboard LED
 #define RF95_CS_PIN 8
 #define RF95_RST_PIN 4
 #define RF95_IRQ0_PIN 3
