@@ -5,7 +5,7 @@
 uint16_t calculateCRC(union Telemetry_Packet * tp){
 	uint8_t crc[] = {0,0};
 	unsigned short x=0;
-	for(x=0; x<TELEMETRY_PACKET_LENGTH-2; ++x){
+	for(x=0; x<TELEMETRY_PACKET_LENGTH-4; ++x){
 		crc[0] ^= tp->byte[x];
 		crc[1] ^= tp->byte[x+1];
 	}
@@ -15,5 +15,4 @@ uint16_t calculateCRC(union Telemetry_Packet * tp){
 void Telemetry_Packet_Init(union Telemetry_Packet * tp){
 	memset(tp, 0, TELEMETRY_PACKET_LENGTH);
 	tp->data.key=0xAAAA;
-	tp->data.crc=0x0B0B;
 }
