@@ -15,33 +15,31 @@ namespace StatusLEDs{
 	void initialize();
 	void test();
 	void tick();
-#define VV_MAX 100
+#define VV_MAX 50
 #define VV_MIN 0
 	inline void setVV(float){
 	};
-#define GPS_MAX 10
-#define GPS_MIN 2
+#define GPS_MAX 20
+#define GPS_MIN 1
 	inline void setGPS(float value){
+		if(value>GPS_MAX)
+			value=GPS_MAX;
 		static float previousGPS;
 		if(value==previousGPS)
 			return;
-		if(value==-2) // No fix!
+		if(value==-1) // No fix!
 			neo->setPixelColor(2, 0); // Off
-		else if(value==-1) // 2D
-			neo->setPixelColor(3, neo->gamma32( \
-				neo->ColorHSV(54612, 255, 255))); // Pink if 2D fix.
 		else{ // Value based on HDOP
 			if(value<GPS_MIN)
 				value=GPS_MIN;
 			if(value>GPS_MAX)
 				value=GPS_MAX;
-			(value-GPS_MIN)*
 			neo->ColorHSV(round((value-GPS_MIN)/(GPS_MAX-GPS_MIN)*45510), 255, 255);
 		}
 		needsUpdate=true;
 	};
 #define RX_MAX 15
-#define RX_MIN 0
+#define RX_MIN -10
 	inline void setRX(float value){
 	// Using HSV values. 0 is Red, 240 is Blue. S and V at max.
 		if(value>RX_MAX)
@@ -51,9 +49,8 @@ namespace StatusLEDs{
 		static float previousRX;
 		if(value==previousRX)
 			return;
-		// The following function works only if RX_MIN==0
 		neo->setPixelColor(3, neo->gamma32( \
-			neo->ColorHSV(round(value*43690/RX_MAX), 255, 255)));
+			neo->ColorHSV(round((value-RX_MIN)/(RX_MAX-RX_MIN)*43690), 255, 255)));
 		needsUpdate=true;
 	};
 };

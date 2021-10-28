@@ -18,10 +18,11 @@ void StatusLEDs::initialize(){
 	if(!neo->begin())
 		Serial.println("neo->begin() returned false");
 	delay(100);
-	neo->setBrightness(128);
+	neo->setBrightness(32);
 	delay(100);
 	neo->clear();
 	delay(100);
+	neo->setBrightness(32);
 	neo->show();
 	delay(100);
 };
@@ -48,7 +49,5 @@ void StatusLEDs::tick(){
 	if(needsUpdate){
 		neo->show();
 		needsUpdate=false;
-		Serial.println("Needed update");
 	}
-	Serial.println("NOT NEEDED");
 };
