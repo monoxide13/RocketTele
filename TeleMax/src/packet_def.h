@@ -15,7 +15,7 @@ struct Telemetry_Packet_Struct{
 	uint32_t timer; // 1/10 seconds since start.
 	uint8_t stage; // Stage the rocket is in.
 	uint8_t sensorStatus; // Accel, Baro, GPS, SD/Tele
-	uint8_t voltage; // x.xx volts. voltage*2/100
+	uint8_t voltage; // x.xx volts. voltage*.02 = actual Voltage. For lipo should be between 3.2 and 4.2. 
 	
 	/* GPS   1+4*4=17 bytes */
 	uint8_t fixqual; // first two bits fixquality (1=nofix, 2=2D, 2=3D), last 6 bits satellite count.
@@ -38,8 +38,8 @@ struct Telemetry_Packet_Struct{
 	
 	
 	/* Baro   4+2=6 bytes */
-	float temp;
-	uint16_t balt; // First byte indicates station pressure set.
+	float temp; // Celcius
+	uint16_t balt; // meters
 	
 	/* Total Data Size -> 62 bytes */
 	/* CRC    2 bytes */
