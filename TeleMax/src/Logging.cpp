@@ -19,7 +19,7 @@
 // Stay under 440 to avoid repeaters.
 // 433-435 Aux/Rptr links. 435-438 Satellite ops. 438-444 ATV rptr.
 #define TX_FREQ 434.3 // in MHz
-#define TX_POWER 5 // 2-20
+#define TX_POWER 15 // 2-20
 #define TX_BUFFER_SIZE 128
 
 namespace {
@@ -30,7 +30,7 @@ namespace {
 	char sendBuffer[TX_BUFFER_SIZE];
 	#endif
 	RH_RF95* downlink;
-	// This must be defined like this so the telemetryPacket can be accessed on 2&4 byte boundaries. If not, causes hard fault and stops MCU. See adafruits write-up on aligned memory access. It should work on 16-bit boundary, but no reason to risk it.
+	// downlinkPacket must be defined like this so the telemetryPacket can be accessed on 2&4 byte boundaries. If not, causes hard fault and stops MCU. See adafruits write-up on aligned memory access. It should work on 16-bit boundary, but no reason to risk it.
 	uint8_t * downlinkPacket = (uint8_t*) new uint32_t[(int)ceil(TELEMETRY_PACKET_LENGTH/4)+2];
 }
 

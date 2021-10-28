@@ -18,7 +18,7 @@ struct Telemetry_Packet_Struct{
 	uint8_t voltage; // x.xx volts. voltage*.02 = actual Voltage. For lipo should be between 3.2 and 4.2. 
 	
 	/* GPS   1+4*4=17 bytes */
-	uint8_t fixqual; // first two bits fixquality (1=nofix, 2=2D, 2=3D), last 6 bits satellite count.
+	uint8_t fixqual; // first two bits fixquality (0=nofix, 1=GPS, 2=DGPS/WAAS), last 6 bits satellite count.
 	float lat;
 		// 16 byte boundary
 	float lon;

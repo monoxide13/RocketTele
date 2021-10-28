@@ -75,7 +75,6 @@ void S_BMP388::tick(){
 		return;
 	if(S_BMP388_int::dataReady){
 		++counter;
-		// TODO: Read measurement.
 		if(!(baro->getMeasurements(temp, pres, altitude))){
 			Logging::log(3, "-BMP388. Reading ready but unable to read");
 		}
@@ -88,9 +87,9 @@ void S_BMP388::tick(){
 double S_BMP388::getMeasurement(){
 	if(sensorStatus!=0)
 		return 0;
-	Logging::log(3, "-B: measurements taken: " + String(counter) + '\n');
+	Logging::log(2, "-B: measurements taken: " + String(counter) + '\n');
 	Logging::telemetryData->data.balt = altitude;
-	Logging::telemetryData->data.temp = temp;;
+	Logging::telemetryData->data.temp = temp;
 	counter=0;
 	return 0;
 };
