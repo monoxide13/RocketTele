@@ -28,10 +28,10 @@ void Staging::stage_STAGE_PRELAUNCH(){
 	}
 
 	if(TeleMax::loopTime > nextMeasurementTime){
+		Logging::telemetryData->data.timer = TeleMax::loopTime;
 		Logging::telemetryData->data.sensorStatus = SensorGroup::getStatus();
 		SensorGroup::getMeasurement();
 		Logging::log(2, "-Staging: Loop counter at measurement time: " + String(loopCounter) + "\n");
-		Logging::telemetryData->data.timer = TeleMax::loopTime;
 		Logging::telemetryData->data.crc = calculateCRC(Logging::telemetryData);
 		Logging::sendTelemetry();
 		nextMeasurementTime = TeleMax::loopTime + 1000000/LOG_RATE;

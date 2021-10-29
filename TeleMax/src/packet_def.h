@@ -12,7 +12,7 @@ extern "C"{
 struct Telemetry_Packet_Struct{
 	/* System Status   4+4+1+1+1=11 bytes */
 	uint32_t key; // key to identify start of packet.
-	uint32_t timer; // 1/10 seconds since start.
+	uint32_t timer; // microseconds since start. Allows for 4294 minutes or 71.5 hours.
 	uint8_t stage; // Stage the rocket is in.
 	uint8_t sensorStatus; // Accel, Baro, GPS, SD/Tele
 	uint8_t voltage; // x.xx volts. voltage*.02 = actual Voltage. For lipo should be between 3.2 and 4.2. 
