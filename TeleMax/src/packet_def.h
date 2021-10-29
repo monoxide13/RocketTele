@@ -38,8 +38,8 @@ struct Telemetry_Packet_Struct{
 	
 	
 	/* Baro   4+2=6 bytes */
-	float temp; // Celcius
-	uint16_t balt; // meters
+	float balt; // meters
+	int16_t temp; // Celcius. / by 100 to get real value.
 	
 	/* Total Data Size -> 62 bytes */
 	/* CRC    2 bytes */

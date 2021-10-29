@@ -89,7 +89,7 @@ double S_BMP388::getMeasurement(){
 		return 0;
 	Logging::log(2, "-B: measurements taken: " + String(counter) + '\n');
 	Logging::telemetryData->data.balt = altitude;
-	Logging::telemetryData->data.temp = temp;
+	Logging::telemetryData->data.temp = (int16_t)round(temp*100);
 	counter=0;
 	return 0;
 };
