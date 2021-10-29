@@ -181,7 +181,7 @@ void Logging::flush(){
 	logFile.flush();
 	#endif
 	#if LOG_DOWNLINK > 0
-	downlink->waitPacketSent(); // Possibly time intensive
+	//downlink->waitPacketSent(); // Possibly time intensive
 	#endif
 };
 

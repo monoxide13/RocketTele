@@ -22,7 +22,7 @@
 // Prefix filename for SD recording. 6 char max.
 #define FILENAME_PREFIX LAUNCH
 // Output telemetry to onboard USB serial port
-#define LOG_USB 2
+#define LOG_USB 0
 // Logging rate, in Hz.
 #define LOG_RATE 1
 
