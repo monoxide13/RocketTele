@@ -106,7 +106,7 @@ void loop(void){
 	// Misc.
 	if(voltageReadTime<TeleMax::loopTime){
 		Logging::telemetryData->data.voltage = analogRead(VOLTAGE_PIN)*330/1024;
-		Logging::log(2, "C:" + String(TeleMax::loopTime) + "," + String(Staging::stage) + ",0,0," + String(Logging::telemetryData->data.voltage*50) + "\n");
+		Logging::log(2, "C:" + String(TeleMax::loopTime) + "," + String(Staging::stage) + ",0,0," + String(Logging::telemetryData->data.voltage/50) + "\n");
 		voltageReadTime = TeleMax::loopTime+10000000; // Every 10 seconds.
 		
 	}
