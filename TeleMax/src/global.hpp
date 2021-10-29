@@ -18,7 +18,7 @@
 // Output telemetry over downlink port
 #define LOG_DOWNLINK 1
 // Output telemetry to SD card
-#define LOG_SD 0
+#define LOG_SD 2
 // Prefix filename for SD recording. 6 char max.
 #define FILENAME_PREFIX LAUNCH
 // Output telemetry to onboard USB serial port
