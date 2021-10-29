@@ -22,9 +22,9 @@ void Output::tick(){
 		state=commands.front();
 		if(repeating){
 			commands.push_back(commands.front());
-			commands.pop_front();
 		}
-	nextTickTime = BaseStation::loopTime + OUTPUT_SWITCH_TIME*1000;
+		commands.pop_front();
+		nextTickTime = BaseStation::loopTime + OUTPUT_SWITCH_TIME*1000;
 	}
 
 };
@@ -32,7 +32,7 @@ void Output::tick(){
 void Output::nonBlocking(std::list<bool> input){
 	repeating=false;
 	commands=input;
-	nextTickTime=BaseStation::loopTime;
+	nextTickTime=0;
 };
 
 void Output::blocking(std::list<bool> input){

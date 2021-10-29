@@ -52,6 +52,7 @@ void setup(void){
 	lcd.backlight();
 	lcd.print("Ready");
 	StatusLEDs::test();
+	packetLed.blocking({1,0,1,0});
 	Serial.println("+Starting Telemetry");
 	if(!telemetry.init()){
 		Serial.println("+Downlink OK");
@@ -60,7 +61,6 @@ void setup(void){
 	}
 	lcd.clear();
 	debugLed.repeat({1,0});
-	packetLed.blocking({1,0,1,0});
 	displayUpdate=0;
 	lcd.print("TSP: ");
 };
@@ -74,6 +74,8 @@ void loop(void){
 	if(displayUpdate<loopTime){
 		//lcd.clear();
 		float time = (millis() - telemetry.lastGoodTime)/(float)1000;
+		if(time>5)
+			StatusLEDs::setRX(-100);
 		lcd.setCursor(5,0);
 		if(time<100)
 			lcd.print(String(time, 1) + "   ");
@@ -91,6 +93,7 @@ void loop(void){
 inline void BaseStation::heartbeat(){
 	StatusLEDs::tick();
 	readyLed.tick();
+	packetLed.tick();
 	debugLed.tick();
 };
 

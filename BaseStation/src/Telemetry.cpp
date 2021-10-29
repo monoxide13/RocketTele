@@ -11,6 +11,10 @@
 uint32_t Ptimer;
 uint16_t Pbalt;
 
+namespace{
+	Telemetry_Packet workingPacket;
+}
+
 Telemetry::Telemetry(){
 	RH_RF95 * downlink;
 	for(snrIter=0; snrIter<SNR_HYSTERESIS; ++snrIter){
@@ -56,10 +60,11 @@ bool Telemetry::receive(){
 			if(offset >= TELEMETRY_PACKET_LENGTH+2){
 				if(rxBuffer[0]=='T' && rxBuffer[1]==':'){
 					keepLooping = true;
-					if(checkPacket((Telemetry_Packet *)rxBuffer)){
+					memcpy(&workingPacket, rxBuffer+2, TELEMETRY_PACKET_LENGTH);
+					if(checkPacket(&workingPacket)){
 						lastGoodTime = millis();
 						// Packet is valid, process and shift.
-						processPacket((Telemetry_Packet *)rxBuffer);
+						processPacket(&workingPacket);
 		   				Serial.write((uint8_t*)rxBuffer, TELEMETRY_PACKET_LENGTH+2);
 				/*		 // Prints out packet in HEX.
 						int x;
@@ -75,7 +80,7 @@ bool Telemetry::receive(){
 						memmove(rxBuffer, rxBuffer+TELEMETRY_PACKET_LENGTH+2, offset);
 					}else{
 						// Packet is invalid, destroy the identifier so we can purge it next loop.
-						Serial.println("Destroying packet");
+						Serial.println("+Destroying packet");
 						rxBuffer[0]='\0';
 					}
 				}else{
@@ -106,9 +111,11 @@ bool Telemetry::receive(){
 
 		//RH_RF95::printBuffer("Buffer:", (uint8_t*)rxBuffer, test);
 		//Serial.println("Length: " + String(test));
+		BaseStation::packetLed.nonBlocking({1,0});
 		snrArray[snrIter]=downlink->lastSNR();
 		Serial.print("R:");
-		Serial.println(snrArray[snrIter]);
+		Serial.write((uint8_t*)(snrArray+snrIter), 2);
+		Serial.print("\n");
 		StatusLEDs::setRX(getSNR());
 		if(++snrIter>=SNR_HYSTERESIS)
 			snrIter=0;
@@ -136,7 +143,10 @@ void Telemetry::processPacket(Telemetry_Packet * ptr){
 	else
 		StatusLEDs::setGPS(ptr->data.hdop);
 	// Calculate Vertical velocitiy in m/s
-	float change = (ptr->data.timer-Ptimer) / (ptr->data.balt-Pbalt) * 10; // *10 to convert 1/10sec to secs.
+	float change = (ptr->data.balt-Pbalt) / ((ptr->data.timer-Ptimer) / 1000000);
+	Ptimer = ptr->data.timer;
+	Pbalt = ptr->data.balt;
 	Serial.print("+Vertical Velocity in m/s:");
 	Serial.println(change);
+	StatusLEDs::setVV(change);
 }

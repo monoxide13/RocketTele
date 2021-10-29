@@ -23,7 +23,7 @@ class Telemetry{
     uint8_t rxBuffer[RX_BUFFER_LENGTH];
     unsigned short offset;
 	unsigned char rxLength;
-	int snrArray[SNR_HYSTERESIS];
+	short snrArray[SNR_HYSTERESIS];
 	unsigned short snrIter;
 };
 
